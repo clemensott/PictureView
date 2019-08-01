@@ -1,0 +1,155 @@
+﻿<Window x:Class="PictureView.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:PictureView"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:con="clr-namespace:StdOttFramework.Converters;assembly=StdOttFrameworkLib"
+        xmlns:spi="clr-namespace:StdOttFramework.Converters.Specialized;assembly=StdOttFrameworkLib"
+        xmlns:ff="clr-namespace:FolderFile;assembly=FolderFileLib"
+        mc:Ignorable="d"
+        Title="{Binding ApplicationTitle}" AllowDrop="True"
+        WindowState="{Binding WindowState,Mode=TwoWay}" WindowStyle="{Binding WindowStyle,Mode=TwoWay}"
+        Activated="Window_Activated" KeyDown="Window_KeyDown" Drop="Window_Drop">
+
+    <Window.Resources>
+        <sys:Double x:Key="btnHeight">100</sys:Double>
+        <Thickness x:Key="btnLeftPadding">5,5,8,5</Thickness>
+        <Thickness x:Key="btnRightPadding">8,5,5,5</Thickness>
+        <Thickness x:Key="btnMargin">5</Thickness>
+
+        <spi:VisibleCollapsedConverter x:Key="visTrueCon"/>
+        <spi:VisibleHiddenConverter x:Key="visHidTrueCon"/>
+        <spi:HiddenVisibleConverter x:Key="hidTrueCon"/>
+        <spi:VisibleCollapsedConverter x:Key="visColNullCon" CompareValue="{x:Null}"/>
+
+        <con:EnumConverter x:Key="fscCon">
+            <con:EnumConverter.Example>
+                <local:FileSystemCollision>Ask</local:FileSystemCollision>
+            </con:EnumConverter.Example>
+        </con:EnumConverter>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Visibility="{Binding ElementName=tbnSettings,Path=IsChecked,
+                Converter={StaticResource visTrueCon}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Source: " Margin="5"
+                       VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Destination: " Margin="5"
+                       VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
+                        Visibility="{Binding UseSource,Converter={StaticResource hidTrueCon}}"
+                        MouseLeftButtonDown="SplFiles_MouseLeftButtonDown">
+                <TextBlock Text="{Binding Sources.Length}"/>
+                <TextBlock Text=" File(s)"/>
+            </StackPanel>
+
+            <ff:FolderPicker Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
+                             Margin="3" SubTypeSelection="ThisAll" AutoRefreshSelection="ForceFalse"
+                             IsRefreshButtonVisible="True" Folder="{Binding Source,Mode=TwoWay}"
+                             Visibility="{Binding UseSource,Converter={StaticResource visHidTrueCon}}"/>
+
+            <ff:FolderPicker Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
+                             Margin="3" AutoRefreshSelection="False"
+                             SubTypeSelection="Hidden" IsRefreshButtonVisible="False"
+                             Folder="{Binding Destination,Mode=TwoWay}"/>
+
+            <WrapPanel Grid.ColumnSpan="2" Grid.Row="2">
+                <xctk:ColorPicker Width="100" Margin="5"
+                                  SelectedColor="{Binding BackgroundColor,Mode=TwoWay}"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="On copy collision:" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="3"/>
+                    <RadioButton Content="Ask"  VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=Ask}"/>
+                    <RadioButton Content="Override" VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=Override}"/>
+                    <RadioButton Content="Do nothing" VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=DoNothing}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="15,0"
+                            Visibility="{Binding UseSource,Converter={StaticResource visTrueCon}}">
+                    <TextBlock Text="Search Pattern" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="3"/>
+                    <TextBox VerticalAlignment="Center" Margin="3" Width="200"
+                             Text="{Binding Extensions,Mode=TwoWay}"/>
+                </StackPanel>
+
+                <Button Content="View in explorer" VerticalAlignment="Center"
+                        Width="100" Margin="3" Click="BtnExplorer_Click"/>
+                <Button Content="Copy &amp; Next" VerticalAlignment="Center"
+                        Width="100" Margin="3" Click="BtnCopy_Click"/>
+                <Button Content="Delete" Width="100" VerticalAlignment="Center"
+                        Margin="3" Click="BtnDelete_Click"/>
+
+                <CheckBox Content="Delete directly" VerticalAlignment="Center" Margin="10,5"
+                          IsChecked="{Binding IsDeleteDirect,Mode=TwoWay}"/>
+            </WrapPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" Name="gidImage" Background="{Binding BackgroundBrush}"
+              MouseEnter="GidImage_MouseEnter" MouseLeave="GidImage_MouseLeave" 
+              MouseWheel="GidImage_MouseWheel" MouseLeftButtonDown="GidImage_MouseLeftButtonDown" 
+              MouseLeftButtonUp="GidImage_MouseLeftButtonUp" SizeChanged="GidImage_SizeChanged">
+
+            <TextBlock Text="No Image" VerticalAlignment="Center" HorizontalAlignment="Center"
+                       FontSize="20" Visibility="{Binding CurrentImage,Converter={StaticResource visColNullCon}}"/>
+
+            <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                   Focusable="True" Source="{Binding CurrentImage.CroppedImage}"/>
+
+            <Image VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Visibility="Hidden" Source="{Binding PreviousImage.Image}"/>
+            <Image VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                   Visibility="Hidden" Source="{Binding NextImage.Image}"/>
+
+            <Grid Opacity="{Binding ControlsOpacity}" 
+                  MouseEnter="GidControls_MouseEnter" MouseLeave="GidControls_MouseLeave">
+                <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Background="White"
+                           Margin="5" Text="{Binding CurrentImage.File.FullName}"/>
+
+                <ToggleButton x:Name="tbnSettings" VerticalAlignment="Top" 
+                              HorizontalAlignment="Left" Padding="5" 
+                              Margin="{StaticResource btnMargin}">
+                    Settings
+                </ToggleButton>
+
+                <ToggleButton VerticalAlignment="Top" HorizontalAlignment="Right" Padding="5" 
+                              Margin="{StaticResource btnMargin}" IsChecked="{Binding IsFullscreen,Mode=TwoWay}">
+                    Fullscreen
+                </ToggleButton>
+
+                <Button Content="&lt;" VerticalAlignment="Center" HorizontalAlignment="Left"
+                        Height="{StaticResource btnHeight}" Padding="{StaticResource btnLeftPadding}"
+                        Margin="{StaticResource btnMargin}" Click="BtnPrevious_Click"/>
+                <Button Content="&gt;" VerticalAlignment="Center" HorizontalAlignment="Right"
+                        Height="{StaticResource btnHeight}" Padding="{StaticResource btnRightPadding}"
+                        Margin="{StaticResource btnMargin}" Click="BtnNext_Click"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
