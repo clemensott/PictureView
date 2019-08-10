@@ -35,7 +35,10 @@ namespace PictureView
 
         private void Window_Activated(object sender, EventArgs e)
         {
+#if !DEBUG
             viewModel?.UpdateImages(0);
+#endif
+
         }
 
         private void GidImage_MouseEnter(object sender, MouseEventArgs e)
