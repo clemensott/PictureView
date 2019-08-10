@@ -384,13 +384,13 @@ namespace PictureView
             updateImagesSlowSem.Release();
         }
 
-        private IEnumerable<string> EnumerateFiles(string beginFile, bool includeBeginFile)
+        private IEnumerable<string> EnumerateFiles(string beginFile, bool startWithBeginFile)
         {
             if (Source != null)
             {
                 return Source.SubType == SubfolderType.All ?
-                    Utils.EnumerateAllFiles(Source.FullName, beginFile, includeBeginFile, GetExtensions()) :
-                    Utils.EnumerateFilesFromFolder(Source.FullName, beginFile, includeBeginFile, GetExtensions());
+                    Utils.EnumerateAllFiles(Source.FullName, beginFile, startWithBeginFile, GetExtensions()) :
+                    Utils.EnumerateFilesFromFolder(Source.FullName, beginFile, startWithBeginFile, GetExtensions());
             }
 
             if (Sources != null && Sources.Length > 1)
@@ -398,7 +398,7 @@ namespace PictureView
                 int index = Sources.IndexOf(beginFile);
 
                 if (index == -1) index = 0;
-                if (!includeBeginFile) index = StdOttStandard.Utils.CycleIndex(index + 1, Sources.Length);
+                if (!startWithBeginFile) index = StdOttStandard.Utils.CycleIndex(index + 1, Sources.Length);
 
                 return Sources.Skip(index).Concat(Sources.Take(index));
             }
@@ -408,7 +408,7 @@ namespace PictureView
                 if (Sources == null || Sources.Length == 0) return new string[0];
 
                 return Utils.EnumerateFilesFromFolder(GetDirectoryPath(Sources[0]),
-                    beginFile, includeBeginFile, GetExtensions());
+                    beginFile, startWithBeginFile, GetExtensions());
             }
             catch
             {
@@ -505,8 +505,8 @@ namespace PictureView
         {
             IEnumerable<string> files;
 
-            if (offset == 0) files = EnumerateFiles(oldCurrentImage?.File?.FullName ?? string.Empty, true);
-            else if (offset > 0) files = EnumerateFiles(oldCurrentImage?.File?.FullName ?? string.Empty, false);
+            if (offset == 0) files = EnumerateFiles(oldCurrentImage?.File?.FullName, true);
+            else if (offset > 0) files = EnumerateFiles(oldCurrentImage?.File?.FullName, false);
             else
             {
                 files = EnumerateFilesReverse(oldCurrentImage?.File?.FullName ?? string.Empty);
