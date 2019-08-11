@@ -113,19 +113,21 @@ namespace PictureView
             }
 
             int splitFilesIndex;
-            string[] array = Sort.MergeInsertionSort(dirFiles, CompareFilePath);
+            string[] array = Sort.HeapSort(dirFiles, CompareFilePath).ToArray();
+
+            if (array.Length == 0) yield break;
 
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {
                 if (CompareFilePath(beginFile, array[splitFilesIndex]) <= compareValue) break;
             }
 
-            for (int i = splitFilesIndex; i < array.Length; i++)
+            for (int i = splitFilesIndex + 1; i < array.Length; i++)
             {
                 yield return array[i];
             }
 
-            for (int i = 0; i < splitFilesIndex; i++)
+            for (int i = 0; i <= splitFilesIndex; i++)
             {
                 yield return array[i];
             }
@@ -133,10 +135,10 @@ namespace PictureView
 
         public static IEnumerable<string> EnumerateAllFiles(string root, string beginFile, bool startWithBeginFile, string[] extensions)
         {
+            if (beginFile == null) beginFile = string.Empty;
+
             int compareValue = startWithBeginFile ? 1 : 0;
             string directory = GetParent(beginFile);
-
-            if (beginFile == null) beginFile = string.Empty;
 
             if (directory.Length > 0)
             {
@@ -176,7 +178,7 @@ namespace PictureView
                         continue;
                     }
 
-                    foreach (string brother in Sort.MergeInsertionSort(parentDirs, NormalizeDirectoryPath, CompareDirectoryPath))
+                    foreach (string brother in Sort.HeapSort(parentDirs, NormalizeDirectoryPath, CompareDirectoryPath))
                     {
                         foreach (string file in EnumerateFilesRecursive(brother, extensions))
                         {
@@ -212,7 +214,7 @@ namespace PictureView
                 enumeration = new string[0];
             }
 
-            foreach (string file in Sort.MergeInsertionSort(enumeration, CompareFilePath))
+            foreach (string file in Sort.HeapSort(enumeration, CompareFilePath))
             {
                 yield return file;
             }
@@ -226,7 +228,7 @@ namespace PictureView
                 enumeration = new string[0];
             }
 
-            foreach (string subDir in Sort.MergeInsertionSort(enumeration, NormalizeDirectoryPath, CompareDirectoryPath))
+            foreach (string subDir in Sort.HeapSort(enumeration, NormalizeDirectoryPath, CompareDirectoryPath))
             {
                 foreach (string file in EnumerateFilesRecursive(subDir, extensions))
                 {
@@ -252,7 +254,9 @@ namespace PictureView
             }
 
             int splitFilesIndex;
-            string[] array = Sort.MergeInsertionSort(dirFiles, CompareFilePath);
+            string[] array = Sort.HeapSort(dirFiles, CompareFilePath).ToArray();
+
+            if (array.Length == 0) yield break;
 
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {
@@ -272,10 +276,10 @@ namespace PictureView
 
         public static IEnumerable<string> EnumerateAllFilesReverse(string root, string beginFile, string[] extensions)
         {
+            if (beginFile == null) beginFile = string.Empty;
+
             IEnumerable<string> dirFiles;
             string directory = GetParent(beginFile);
-
-            if (beginFile == null) beginFile = string.Empty;
 
             if (directory.Length > 0)
             {
@@ -290,7 +294,7 @@ namespace PictureView
                     yield break;
                 }
 
-                foreach (string path in Sort.MergeInsertionSort(dirFiles, CompareFilePath).Reverse())
+                foreach (string path in Sort.HeapSortDesc(dirFiles, CompareFilePath))
                 {
                     yield return path;
                 }
@@ -315,7 +319,7 @@ namespace PictureView
                         continue;
                     }
 
-                    foreach (string brother in Sort.MergeInsertionSort(parentDirs, CompareDirectoryPath).Reverse())
+                    foreach (string brother in Sort.HeapSortDesc(parentDirs, CompareDirectoryPath))
                     {
                         foreach (string file in EnumerateFilesReverseRecursive(brother, extensions))
                         {
@@ -334,7 +338,7 @@ namespace PictureView
                         yield break;
                     }
 
-                    foreach (string file in Sort.MergeInsertionSort(dirFiles, CompareFilePath).Reverse())
+                    foreach (string file in Sort.HeapSortDesc(dirFiles, CompareFilePath))
                     {
                         yield return file;
                     }
@@ -364,7 +368,7 @@ namespace PictureView
                 enummeration = new string[0];
             }
 
-            foreach (string subDir in Sort.MergeInsertionSort(enummeration, NormalizeDirectoryPath, CompareDirectoryPath).Reverse())
+            foreach (string subDir in Sort.HeapSortDesc(enummeration, NormalizeDirectoryPath, CompareDirectoryPath))
             {
                 foreach (string file in EnumerateFilesReverseRecursive(subDir, extensions))
                 {
@@ -383,7 +387,7 @@ namespace PictureView
                 enummeration = new string[0];
             }
 
-            foreach (string file in Sort.MergeInsertionSort(enummeration, CompareFilePath).Reverse())
+            foreach (string file in Sort.HeapSortDesc(enummeration, CompareFilePath))
             {
                 yield return file;
             }
