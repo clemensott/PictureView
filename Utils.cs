@@ -115,19 +115,17 @@ namespace PictureView
             int splitFilesIndex;
             string[] array = Sort.HeapSort(dirFiles, CompareFilePath).ToArray();
 
-            if (array.Length == 0) yield break;
-
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {
-                if (CompareFilePath(beginFile, array[splitFilesIndex]) <= compareValue) break;
+                if (CompareFilePath(beginFile, array[splitFilesIndex]) < compareValue) break;
             }
 
-            for (int i = splitFilesIndex + 1; i < array.Length; i++)
+            for (int i = splitFilesIndex; i < array.Length; i++)
             {
                 yield return array[i];
             }
 
-            for (int i = 0; i <= splitFilesIndex; i++)
+            for (int i = 0; i < splitFilesIndex; i++)
             {
                 yield return array[i];
             }
@@ -255,8 +253,6 @@ namespace PictureView
 
             int splitFilesIndex;
             string[] array = Sort.HeapSort(dirFiles, CompareFilePath).ToArray();
-
-            if (array.Length == 0) yield break;
 
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {
