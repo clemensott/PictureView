@@ -20,7 +20,7 @@ namespace PictureView
         private const string applicationName = "Picview";
 
         private readonly SemaphoreSlim updateImagesSlowSem;
-        private int updateCount;
+        private int updateCount, lastUpdateOffset;
         private bool isUpdatingImages, viewControls, isUpdatingOpacity,
             useSource, isFullscreen, isApplyingFullscreen, isDeleteDirect;
         private double controlsOpacity;
@@ -31,8 +31,6 @@ namespace PictureView
         private Color backgroundColor;
         private readonly FiFoBuffer<string, FileSystemImage> buffer;
         private FileSystemImage currentImage, previousImage, nextImage;
-        private Rect currentImageCropRect;
-        private CroppedBitmap currentImageCropped;
         private Folder source, destination;
         private FileSystemCollision copyCollision;
 
@@ -341,6 +339,8 @@ namespace PictureView
 
         private async void UpdateImages(int offset, string path)
         {
+            lastUpdateOffset = offset;
+
             if (isUpdatingImages) return;
             isUpdatingImages = true;
 
@@ -522,6 +522,7 @@ namespace PictureView
 
             await UpdateImage(CurrentImage);
 
+            // possible if UpdateImages() was called during previous await
             if (currentFilePath != CurrentImage?.File?.FullName)
             {
                 PreviousImage = NextImage = null;
@@ -530,15 +531,19 @@ namespace PictureView
 
             if (CurrentImage?.Image == null)
             {
-                IEnumerable<string> currentFiles = EnumerateFiles(currentFilePath, true);
+                IEnumerable<string> currentFiles = lastUpdateOffset >= 0 ?
+                    EnumerateFiles(currentFilePath, true) : EnumerateFilesReverse(currentFilePath);
 
-                CurrentImage = await GetImage(currentFiles, 0, currentFilePath, CurrentImage);
+                FileSystemImage currentImg = await GetImage(currentFiles, 0, currentFilePath, CurrentImage);
 
-                if (currentFilePath != CurrentImage?.File?.FullName)
+                if (CurrentImage?.Image == null || currentFilePath != CurrentImage?.File?.FullName)
                 {
                     PreviousImage = NextImage = null;
                     return;
                 }
+
+                CurrentImage = currentImg;
+                currentFilePath = CurrentImage?.File?.FullName;
             }
 
             IEnumerable<string> nextFiles = EnumerateFiles(currentFilePath, false);
