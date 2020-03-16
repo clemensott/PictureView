@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FolderFile;
+using StdOttFramework.RestoreWindow;
 
 namespace PictureView
 {
@@ -25,6 +26,8 @@ namespace PictureView
         public MainWindow()
         {
             InitializeComponent();
+
+            RestoreWindowHandler.Activate(this, RestoreWindowSettings.GetDefault());
 
             DataContext = viewModel = new ViewModel();
             viewModel.BackgroundColor = Background is SolidColorBrush brush ? brush.Color : Colors.White;
