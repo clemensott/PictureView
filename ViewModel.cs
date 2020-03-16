@@ -431,7 +431,7 @@ namespace PictureView
 
                 if (index == -1) index = 0;
 
-                return Sources.Take(index + 1).Reverse().Concat(Sources.Skip(index + 1).Reverse());
+                return Sources.Take(index).Reverse().Concat(Sources.Skip(index).Reverse());
             }
 
             try
