@@ -398,7 +398,7 @@ namespace PictureView
                 int index = Sources.IndexOf(beginFile);
 
                 if (index == -1) index = 0;
-                if (!startWithBeginFile) index = StdOttStandard.Utils.CycleIndex(index + 1, Sources.Length);
+                if (!startWithBeginFile) index = StdUtils.CycleIndex(index + 1, Sources.Length);
 
                 return Sources.Skip(index).Concat(Sources.Take(index));
             }

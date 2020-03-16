@@ -7,7 +7,6 @@
         xmlns:local="clr-namespace:PictureView"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:con="clr-namespace:StdOttFramework.Converters;assembly=StdOttFrameworkLib"
-        xmlns:spi="clr-namespace:StdOttFramework.Converters.Specialized;assembly=StdOttFrameworkLib"
         xmlns:ff="clr-namespace:FolderFile;assembly=FolderFileLib"
         mc:Ignorable="d"
         Title="{Binding ApplicationTitle}" AllowDrop="True"
@@ -20,10 +19,10 @@
         <Thickness x:Key="btnRightPadding">8,5,5,5</Thickness>
         <Thickness x:Key="btnMargin">5</Thickness>
 
-        <spi:VisibleCollapsedConverter x:Key="visTrueCon"/>
-        <spi:VisibleHiddenConverter x:Key="visHidTrueCon"/>
-        <spi:HiddenVisibleConverter x:Key="hidTrueCon"/>
-        <spi:VisibleCollapsedConverter x:Key="visColNullCon" CompareValue="{x:Null}"/>
+        <con:VisibleCollapsedConverter x:Key="visTrueCon"/>
+        <con:VisibleHiddenConverter x:Key="visHidTrueCon"/>
+        <con:HiddenVisibleConverter x:Key="hidTrueCon"/>
+        <con:VisibleCollapsedConverter x:Key="visColNullCon" CompareValue="{x:Null}"/>
 
         <con:EnumConverter x:Key="fscCon">
             <con:EnumConverter.Example>
