@@ -9,8 +9,10 @@
         xmlns:con="clr-namespace:StdOttFramework.Converters;assembly=StdOttFrameworkLib"
         xmlns:ff="clr-namespace:FolderFile;assembly=FolderFileLib"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:ViewModel}"
         Title="{Binding ApplicationTitle}" AllowDrop="True"
-        WindowState="{Binding WindowState,Mode=TwoWay}" WindowStyle="{Binding WindowStyle,Mode=TwoWay}"
+        WindowState="{Binding WindowState,Mode=TwoWay}"
+        WindowStyle="{Binding WindowStyle,Mode=TwoWay}"
         Activated="Window_Activated" KeyDown="Window_KeyDown" Drop="Window_Drop">
 
     <Window.Resources>
@@ -19,10 +21,9 @@
         <Thickness x:Key="btnRightPadding">8,5,5,5</Thickness>
         <Thickness x:Key="btnMargin">5</Thickness>
 
-        <con:VisibleCollapsedConverter x:Key="visTrueCon"/>
-        <con:VisibleHiddenConverter x:Key="visHidTrueCon"/>
-        <con:HiddenVisibleConverter x:Key="hidTrueCon"/>
-        <con:VisibleCollapsedConverter x:Key="visColNullCon" CompareValue="{x:Null}"/>
+        <con:VisibleCollapsedConverter x:Key="visColCon"/>
+        <con:VisibleHiddenConverter x:Key="visHidCon"/>
+        <con:HiddenVisibleConverter x:Key="hidVisCon"/>
 
         <con:EnumConverter x:Key="fscCon">
             <con:EnumConverter.Example>
@@ -31,6 +32,10 @@
         </con:EnumConverter>
     </Window.Resources>
 
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -38,7 +43,7 @@
         </Grid.RowDefinitions>
 
         <Grid Visibility="{Binding ElementName=tbnSettings,Path=IsChecked,
-                Converter={StaticResource visTrueCon}}">
+                Converter={StaticResource visColCon}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -56,7 +61,7 @@
                        VerticalAlignment="Center" HorizontalAlignment="Right"/>
 
             <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
-                        Visibility="{Binding UseSource,Converter={StaticResource hidTrueCon}}"
+                        Visibility="{Binding UseSource,Converter={StaticResource hidVisCon}}"
                         MouseLeftButtonDown="SplFiles_MouseLeftButtonDown">
                 <TextBlock Text="{Binding Sources.Length}"/>
                 <TextBlock Text=" File(s)"/>
@@ -65,7 +70,7 @@
             <ff:FolderPicker Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
                              Margin="3" SubTypeSelection="ThisAll" AutoRefreshSelection="ForceFalse"
                              IsRefreshButtonVisible="True" Folder="{Binding Source,Mode=TwoWay}"
-                             Visibility="{Binding UseSource,Converter={StaticResource visHidTrueCon}}"/>
+                             Visibility="{Binding UseSource,Converter={StaticResource visHidCon}}"/>
 
             <ff:FolderPicker Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
                              Margin="3" AutoRefreshSelection="False"
@@ -91,7 +96,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="15,0"
-                            Visibility="{Binding UseSource,Converter={StaticResource visTrueCon}}">
+                            Visibility="{Binding UseSource,Converter={StaticResource visColCon}}">
                     <TextBlock Text="Search Pattern" FontWeight="Bold"
                                VerticalAlignment="Center" Margin="3"/>
                     <TextBox VerticalAlignment="Center" Margin="3" Width="200"
@@ -115,8 +120,17 @@
               MouseWheel="GidImage_MouseWheel" MouseLeftButtonDown="GidImage_MouseLeftButtonDown" 
               MouseLeftButtonUp="GidImage_MouseLeftButtonUp" SizeChanged="GidImage_SizeChanged">
 
-            <TextBlock Text="No Image" VerticalAlignment="Center" HorizontalAlignment="Center"
-                       FontSize="20" Visibility="{Binding CurrentImage,Converter={StaticResource visColNullCon}}"/>
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
+                  Visibility="{Binding CurrentImage.IsImageLoaded,Converter={StaticResource hidVisCon}}">
+                <TextBlock Text="Loading..." FontSize="20"
+                           Visibility="{Binding CurrentImage,Converter={StaticResource visColCon}}"/>
+            </Grid>
+
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
+                  Visibility="{Binding CurrentImage.IsImageLoaded,Converter={StaticResource visColCon}}">
+                <TextBlock Text="No Image" FontSize="20"
+                           Visibility="{Binding CurrentImage.Image,Converter={StaticResource hidVisCon}}"/>
+            </Grid>
 
             <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                    Focusable="True" Source="{Binding CurrentImage.CroppedImage}"/>
@@ -131,16 +145,13 @@
                 <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Background="White"
                            Margin="5" Text="{Binding CurrentImage.File.FullName}"/>
 
-                <ToggleButton x:Name="tbnSettings" VerticalAlignment="Top" 
+                <ToggleButton x:Name="tbnSettings" Content="Settings" VerticalAlignment="Top" 
                               HorizontalAlignment="Left" Padding="5" 
-                              Margin="{StaticResource btnMargin}">
-                    Settings
-                </ToggleButton>
+                              Margin="{StaticResource btnMargin}"/>
 
-                <ToggleButton VerticalAlignment="Top" HorizontalAlignment="Right" Padding="5" 
-                              Margin="{StaticResource btnMargin}" IsChecked="{Binding IsFullscreen,Mode=TwoWay}">
-                    Fullscreen
-                </ToggleButton>
+
+                <ToggleButton VerticalAlignment="Top" Content="Fullscreen" HorizontalAlignment="Right" Padding="5" 
+                              Margin="{StaticResource btnMargin}" IsChecked="{Binding IsFullscreen,Mode=TwoWay}"/>
 
                 <Button Content="&lt;" VerticalAlignment="Center" HorizontalAlignment="Left"
                         Height="{StaticResource btnHeight}" Padding="{StaticResource btnLeftPadding}"

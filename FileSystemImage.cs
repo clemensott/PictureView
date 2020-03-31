@@ -11,7 +11,7 @@ namespace PictureView
     class FileSystemImage : IDisposable, INotifyPropertyChanged
     {
         private byte[] data;
-        private bool isImageOutdated;
+        private bool isImageOutdated, isImageLoaded;
         private Rect? cropRect;
         private BitmapSource image;
         private ImageSource croppedImage;
@@ -41,6 +41,18 @@ namespace PictureView
 
                 isImageOutdated = value;
                 OnPropertyChanged(nameof(IsImageOutdated));
+            }
+        }
+
+        public bool IsImageLoaded
+        {
+            get => isImageLoaded;
+            set
+            {
+                if (value == isImageLoaded) return;
+
+                isImageLoaded = value;
+                OnPropertyChanged(nameof(IsImageLoaded));
             }
         }
 
@@ -91,6 +103,7 @@ namespace PictureView
         {
             File = file;
 
+            IsImageLoaded = false;
             Data = null;
             Image = null;
         }
@@ -118,6 +131,10 @@ namespace PictureView
             catch
             {
                 Image = null;
+            }
+            finally
+            {
+                IsImageLoaded = true;
             }
 
             IsImageOutdated = false;
@@ -176,6 +193,8 @@ namespace PictureView
         public void Dispose()
         {
             Data = null;
+            Image = null;
+            CroppedImage = null;
         }
     }
 }

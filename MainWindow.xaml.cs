@@ -29,7 +29,7 @@ namespace PictureView
 
             RestoreWindowHandler.Activate(this, RestoreWindowSettings.GetDefault());
 
-            DataContext = viewModel = new ViewModel();
+            viewModel = (ViewModel)DataContext;
             viewModel.BackgroundColor = Background is SolidColorBrush brush ? brush.Color : Colors.White;
             viewModel.ViewControls = false;
 
