@@ -5,15 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:PictureView"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:con="clr-namespace:StdOttFramework.Converters;assembly=StdOttFrameworkLib"
         xmlns:ff="clr-namespace:FolderFile;assembly=FolderFileLib"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:ViewModel}"
+        d:DesignHeight="479.1" d:DesignWidth="729.273"
         Title="{Binding ApplicationTitle}" AllowDrop="True"
         WindowState="{Binding WindowState,Mode=TwoWay}"
         WindowStyle="{Binding WindowStyle,Mode=TwoWay}"
-        Activated="Window_Activated" KeyDown="Window_KeyDown" Drop="Window_Drop">
+        Activated="Window_Activated" 
+        KeyDown="Window_KeyDown" Drop="Window_Drop">
 
     <Window.Resources>
         <sys:Double x:Key="btnHeight">100</sys:Double>

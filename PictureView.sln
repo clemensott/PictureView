@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureView", "PictureView.csproj", "{15EEE77A-A1A3-4B00-845C-E107E2BBFA3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PictureView", "PictureView.csproj", "{3FF18D68-119D-4ED8-AEDA-B246F7B45C7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StdOttStandardLib", "..\StdOttLib\StdOttStandardLib\StdOttStandardLib.csproj", "{E3EC8804-5369-411A-AF2C-6505DC535A7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StdOttStandardLib", "..\StdOttLib\StdOttStandardLib\StdOttStandardLib.csproj", "{1E6CCABA-41C5-4A51-BB49-E49CE1A9F93F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StdOttFrameworkLib", "..\StdOttLib\StdOttFrameworkLib\StdOttFrameworkLib.csproj", "{D1334524-78A5-4D16-93BF-27A57C6DBE56}"
 EndProject
@@ -17,14 +17,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{15EEE77A-A1A3-4B00-845C-E107E2BBFA3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15EEE77A-A1A3-4B00-845C-E107E2BBFA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15EEE77A-A1A3-4B00-845C-E107E2BBFA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15EEE77A-A1A3-4B00-845C-E107E2BBFA3A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3EC8804-5369-411A-AF2C-6505DC535A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3EC8804-5369-411A-AF2C-6505DC535A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3EC8804-5369-411A-AF2C-6505DC535A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3EC8804-5369-411A-AF2C-6505DC535A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FF18D68-119D-4ED8-AEDA-B246F7B45C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FF18D68-119D-4ED8-AEDA-B246F7B45C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FF18D68-119D-4ED8-AEDA-B246F7B45C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FF18D68-119D-4ED8-AEDA-B246F7B45C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E6CCABA-41C5-4A51-BB49-E49CE1A9F93F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E6CCABA-41C5-4A51-BB49-E49CE1A9F93F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E6CCABA-41C5-4A51-BB49-E49CE1A9F93F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E6CCABA-41C5-4A51-BB49-E49CE1A9F93F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1334524-78A5-4D16-93BF-27A57C6DBE56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1334524-78A5-4D16-93BF-27A57C6DBE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1334524-78A5-4D16-93BF-27A57C6DBE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B9B38371-7665-46D2-9ECD-F3F4CB955BFA}
+		SolutionGuid = {69BE7B1D-BF3E-466F-950C-37215FAA9A72}
 	EndGlobalSection
 EndGlobal
