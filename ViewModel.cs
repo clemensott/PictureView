@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FolderFile;
+using PictureView.EnumerateFiles;
 using StdOttStandard;
 
 namespace PictureView
@@ -389,8 +390,8 @@ namespace PictureView
             if (Source != null)
             {
                 return Source.SubType == SubfolderType.All ?
-                    Utils.EnumerateAllFiles(Source.FullName, beginFile, startWithBeginFile, GetExtensions()) :
-                    Utils.EnumerateFilesFromFolder(Source.FullName, beginFile, startWithBeginFile, GetExtensions());
+                    FolderSubForward.Get(Source.FullName, beginFile, startWithBeginFile, GetExtensions()) :
+                    FolderForward.Get(Source.FullName, beginFile, startWithBeginFile, GetExtensions());
             }
 
             if (Sources != null && Sources.Length > 1)
@@ -407,7 +408,7 @@ namespace PictureView
             {
                 if (Sources == null || Sources.Length == 0) return new string[0];
 
-                return Utils.EnumerateFilesFromFolder(GetDirectoryPath(Sources[0]),
+                return FolderForward.Get(GetDirectoryPath(Sources[0]),
                     beginFile, startWithBeginFile, GetExtensions());
             }
             catch
@@ -421,8 +422,8 @@ namespace PictureView
             if (Source != null)
             {
                 return Source.SubType == SubfolderType.All ?
-                    Utils.EnumerateAllFilesReverse(Source.FullName, beginFile, GetExtensions()) :
-                    Utils.EnumerateFilesFromFolderReverse(Source.FullName, beginFile, GetExtensions());
+                    FolderBackward.Get(Source.FullName, beginFile, GetExtensions()) :
+                    FolderSubBackward.Get(Source.FullName, beginFile, GetExtensions());
             }
 
             if (Sources.Length > 1)
@@ -438,7 +439,7 @@ namespace PictureView
             {
                 if (Sources.Length == 0) return new string[0];
 
-                return Utils.EnumerateFilesFromFolderReverse(GetDirectoryPath(Sources[0]), beginFile, GetExtensions());
+                return FolderBackward.Get(GetDirectoryPath(Sources[0]), beginFile, GetExtensions());
             }
             catch
             {

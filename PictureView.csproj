@@ -74,16 +74,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AsyncEnumerator.cs" />
-    <Compile Include="BinaryTree\DirectoriesBinaryTree.cs" />
+    <Compile Include="EnumerateFiles\FolderBackward.cs" />
+    <Compile Include="EnumerateFiles\FolderForward.cs" />
+    <Compile Include="EnumerateFiles\FolderSubBackward.cs" />
+    <Compile Include="EnumerateFiles\FolderSubForward.cs" />
+    <Compile Include="EnumerateFiles\Helper.cs" />
     <Compile Include="FiFoBuffer.cs" />
     <Compile Include="ByteLoader.cs" />
-    <Compile Include="BinaryTree\FilesBinaryTree.cs" />
-    <Compile Include="BinaryTree\FileSystem.cs" />
     <Compile Include="FileSystemCollision.cs" />
     <Compile Include="FileSystemImage.cs" />
-    <Compile Include="BinaryTree\BinaryTree.cs" />
-    <Compile Include="BinaryTree\BinaryTreeNode.cs" />
-    <Compile Include="BinaryTree\FileSystemNode.cs" />
     <Compile Include="IntSize.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModel.cs" />
@@ -144,5 +143,6 @@
   <ItemGroup>
     <Resource Include="Icon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
