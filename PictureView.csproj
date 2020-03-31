@@ -79,7 +79,7 @@
     <Compile Include="EnumerateFiles\FolderSubBackward.cs" />
     <Compile Include="EnumerateFiles\FolderSubForward.cs" />
     <Compile Include="EnumerateFiles\Helper.cs" />
-    <Compile Include="FiFoBuffer.cs" />
+    <Compile Include="FiFoImagesBuffer.cs" />
     <Compile Include="ByteLoader.cs" />
     <Compile Include="FileSystemCollision.cs" />
     <Compile Include="FileSystemImage.cs" />

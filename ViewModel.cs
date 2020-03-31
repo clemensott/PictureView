@@ -29,7 +29,7 @@ namespace PictureView
         private string extensions;
         private string[] sources;
         private Color backgroundColor;
-        private readonly FiFoBuffer<string, FileSystemImage> buffer;
+        private readonly FiFoImagesBuffer buffer;
         private FileSystemImage currentImage, previousImage, nextImage;
         private Folder source, destination;
         private FileSystemCollision copyCollision;
@@ -276,7 +276,7 @@ namespace PictureView
         public ViewModel()
         {
             updateImagesSlowSem = new SemaphoreSlim(1);
-            buffer = new FiFoBuffer<string, FileSystemImage>(30);
+            buffer = new FiFoImagesBuffer(3, 30, 100_000_000);
 
             ViewControls = true;
             WindowState = WindowState.Normal;
