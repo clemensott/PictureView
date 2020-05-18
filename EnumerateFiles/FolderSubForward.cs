@@ -1,11 +1,11 @@
-﻿using StdOttStandard;
+﻿using StdOttStandard.Linq.Sort;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace PictureView.EnumerateFiles
 {
-    class FolderSubForward
+    static class FolderSubForward
     {
         public static IEnumerable<string> Get(string root, string beginFile, bool startWithBeginFile, string[] extensions)
         {
@@ -52,7 +52,7 @@ namespace PictureView.EnumerateFiles
                         continue;
                     }
 
-                    foreach (string brother in Sort.HeapSort(parentDirs, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
+                    foreach (string brother in SortUtils.HeapSort(parentDirs, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
                     {
                         foreach (string file in EnumerateFilesRecursive(brother, extensions))
                         {
@@ -88,7 +88,7 @@ namespace PictureView.EnumerateFiles
                 enumeration = new string[0];
             }
 
-            foreach (string file in Sort.HeapSort(enumeration, Helper.CompareFilePath))
+            foreach (string file in SortUtils.HeapSort(enumeration, Helper.CompareFilePath))
             {
                 yield return file;
             }
@@ -102,7 +102,7 @@ namespace PictureView.EnumerateFiles
                 enumeration = new string[0];
             }
 
-            foreach (string subDir in Sort.HeapSort(enumeration, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
+            foreach (string subDir in SortUtils.HeapSort(enumeration, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
             {
                 foreach (string file in EnumerateFilesRecursive(subDir, extensions))
                 {

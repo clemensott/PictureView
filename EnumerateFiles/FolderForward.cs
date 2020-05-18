@@ -1,11 +1,11 @@
-﻿using StdOttStandard;
+﻿using StdOttStandard.Linq.Sort;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace PictureView.EnumerateFiles
 {
-    class FolderForward
+    static class FolderForward
     {
         public static IEnumerable<string> Get(string directory, string beginFile, bool startWithBeginFile, string[] extensions)
         {
@@ -26,7 +26,7 @@ namespace PictureView.EnumerateFiles
             }
 
             int splitFilesIndex;
-            string[] array = Sort.HeapSort(dirFiles, Helper.CompareFilePath).ToArray();
+            string[] array = SortUtils.HeapSort(dirFiles, Helper.CompareFilePath).ToArray();
 
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FolderFile;
 using StdOttFramework.RestoreWindow;
+using StdOttStandard;
 
 namespace PictureView
 {
@@ -41,7 +42,6 @@ namespace PictureView
 #if !DEBUG
             viewModel?.UpdateImages(0);
 #endif
-
         }
 
         private void GidImage_MouseEnter(object sender, MouseEventArgs e)
@@ -173,7 +173,7 @@ namespace PictureView
                 srcFile.FullName, ConvertSize(srcFile.Length), destFileName, ConvertSize(destFile.Length));
 
             return MessageBox.Show(message, "Replace?", MessageBoxButton.YesNo,
-                       MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+                MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
         }
 
         private static bool Delete(FileInfo file, bool ask = true)
@@ -200,7 +200,7 @@ namespace PictureView
             string message = string.Format("Delete?\r\n{0}\r\nSize: {1}", file.FullName, size);
 
             return MessageBox.Show(message, "Delete?", MessageBoxButton.YesNo,
-                       MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
+                MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
         }
 
         private static string ConvertSize(long bytes)
@@ -359,6 +359,18 @@ namespace PictureView
         private void SplFiles_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2) viewModel.UseSource = true;
+        }
+
+        private void BtnInfo_Click(object sender, RoutedEventArgs e)
+        {
+            FileSystemImage img = viewModel.CurrentImage;
+            BitmapSource crop = (BitmapSource)img?.CroppedImage;
+            string text =
+                $"Image: {img?.Image?.PixelWidth} x {img?.Image?.PixelHeight}\r\n" +
+                $"Crop: {crop?.PixelWidth ?? -1} x {crop?.PixelHeight ?? -1}\r\n" +
+                $"Size: {StdUtils.GetFormattedFileSize(img?.File.Length ?? -1)}";
+
+            MessageBox.Show(text);
         }
     }
 }

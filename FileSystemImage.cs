@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using StdOttStandard;
+using StdOttStandard.Linq;
 
 namespace PictureView
 {

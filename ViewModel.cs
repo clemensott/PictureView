@@ -10,6 +10,7 @@ using System.Windows.Media;
 using FolderFile;
 using PictureView.EnumerateFiles;
 using StdOttStandard;
+using StdOttStandard.Linq;
 
 namespace PictureView
 {

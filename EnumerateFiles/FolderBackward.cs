@@ -1,4 +1,4 @@
-﻿using StdOttStandard;
+﻿using StdOttStandard.Linq.Sort;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace PictureView.EnumerateFiles
             }
 
             int splitFilesIndex;
-            string[] array = Sort.HeapSort(dirFiles, Helper.CompareFilePath).ToArray();
+            string[] array = SortUtils.HeapSort(dirFiles, Helper.CompareFilePath).ToArray();
 
             for (splitFilesIndex = 0; splitFilesIndex < array.Length; splitFilesIndex++)
             {
