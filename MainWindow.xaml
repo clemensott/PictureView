@@ -149,13 +149,21 @@
                            Margin="5" Text="{Binding CurrentImage.File.FullName}" />
 
                 <ToggleButton x:Name="tbnSettings" Content="Settings" VerticalAlignment="Top"
-                              HorizontalAlignment="Left" Padding="5"
+                              HorizontalAlignment="Left" Padding="5" Width="100"
                               Margin="{StaticResource btnMargin}" />
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <Button Content="Info" Padding="5" Margin="{StaticResource btnMargin}" Click="BtnInfo_Click"></Button>
+                    <StackPanel Orientation="Horizontal"
+                                Visibility="{Binding CurrentImage,Converter={StaticResource visColCon}}">
+                        <Button Content="Open Explorer" Padding="5" Margin="{StaticResource btnMargin}" Width="100"
+                                Visibility="{Binding CurrentImage.Image,Converter={StaticResource visColCon}}"
+                                Click="BtnOpenExplorer_Click" />
+                        <Button Content="Info" Padding="5" Margin="{StaticResource btnMargin}" Width="100"
+                                Visibility="{Binding CurrentImage.Image,Converter={StaticResource visColCon}}"
+                                Click="BtnInfo_Click" />
+                    </StackPanel>
                     <ToggleButton Content="Fullscreen" Padding="5" Margin="{StaticResource btnMargin}"
-                                  IsChecked="{Binding IsFullscreen,Mode=TwoWay}" />
+                                  Width="100" IsChecked="{Binding IsFullscreen,Mode=TwoWay}" />
                 </StackPanel>
 
                 <Button Content="&lt;" VerticalAlignment="Center" HorizontalAlignment="Left"

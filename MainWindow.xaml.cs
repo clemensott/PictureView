@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -66,6 +67,32 @@ namespace PictureView
             if (!gidControlsEnterState) viewModel.ViewControls = false;
         }
 
+        private void BtnInfo_Click(object sender, RoutedEventArgs e)
+        {
+            FileSystemImage img = viewModel.CurrentImage;
+            BitmapSource crop = (BitmapSource)img?.CroppedImage;
+            string text =
+                $"Image: {img?.Image?.PixelWidth} x {img?.Image?.PixelHeight}\r\n" +
+                $"Crop: {crop?.PixelWidth ?? -1} x {crop?.PixelHeight ?? -1}\r\n" +
+                $"Size: {StdUtils.GetFormattedFileSize(img?.File.Length ?? -1)}";
+
+            MessageBox.Show(text);
+        }
+
+        private void BtnOpenExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string path = viewModel.CurrentImage.File.FullName;
+                string args = $"/select,\"{path}\"";
+                Process.Start("explorer.exe", args);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Open explorer error");
+            }
+        }
+
         private void BtnPrevious_Click(object sender, RoutedEventArgs e)
         {
             viewModel.UpdateImages(-1);
@@ -103,6 +130,7 @@ namespace PictureView
                     {
                         viewModel.UpdateImages(1);
                     }
+
                     break;
 
                 case Key.Right:
@@ -124,6 +152,10 @@ namespace PictureView
 
                 case Key.F:
                     viewModel.IsFullscreen = !viewModel.IsFullscreen;
+                    break;
+
+                case Key.C when Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.LeftCtrl):
+                    CopyToClipboard(viewModel.CurrentImage);
                     break;
 
                 default:
@@ -169,8 +201,11 @@ namespace PictureView
         private static bool AskCopy(FileInfo srcFile, string destFileName)
         {
             FileInfo destFile = new FileInfo(destFileName);
-            string message = string.Format("Replace file?\r\nSource: {0}\r\nSize {1}\r\nDestination: {2}\r\nSize {3}",
-                srcFile.FullName, ConvertSize(srcFile.Length), destFileName, ConvertSize(destFile.Length));
+            string message =
+                $"Replace file?\r\nSource: {srcFile.FullName}\r\n" +
+                $"Size {StdUtils.GetFormattedFileSize(srcFile.Length)}\r\n" +
+                $"Destination: {destFileName}\r\n" +
+                $"Size {StdUtils.GetFormattedFileSize(destFile.Length)}";
 
             return MessageBox.Show(message, "Replace?", MessageBoxButton.YesNo,
                 MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
@@ -187,35 +222,45 @@ namespace PictureView
                 file.Delete();
                 return true;
             }
-            catch { }
-
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         private static bool AskDelete(FileInfo file)
         {
             if (file == null) return false;
 
-            string size = ConvertSize(file.Length);
-            string message = string.Format("Delete?\r\n{0}\r\nSize: {1}", file.FullName, size);
+            string size = StdUtils.GetFormattedFileSize(file.Length);
+            string message = $"Delete?\r\n{file.FullName}\r\nSize: {size}";
 
             return MessageBox.Show(message, "Delete?", MessageBoxButton.YesNo,
                 MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
         }
 
-        private static string ConvertSize(long bytes)
+        private static void CopyToClipboard(FileSystemImage image)
         {
-            if (bytes < 1000) return bytes + " Bytes";
+            try
+            {
+                if (image?.Image != null) Clipboard.SetImage(image.Image);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Copy file drop error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-            double size = bytes / 1000.0;
-            if (size < 1000) return Math.Round(size, 2, MidpointRounding.ToEven) + " kB";
-            size /= 1000;
-            if (size < 1000) return Math.Round(size, 2, MidpointRounding.ToEven) + " MB";
-            size /= 1000;
-            if (size < 1000) return Math.Round(size, 2, MidpointRounding.ToEven) + " GB";
-            size /= 1000;
+            try
+            {
+                if (image?.File == null) return;
 
-            return Math.Round(size, 2, MidpointRounding.ToEven) + " TB";
+                StringCollection dropList = new StringCollection {image.File.FullName};
+                Clipboard.SetFileDropList(dropList);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Copy file drop error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnCopy_Click(object sender, RoutedEventArgs e)
@@ -239,10 +284,13 @@ namespace PictureView
 
                 if (string.IsNullOrWhiteSpace(filePath)) return;
 
-                string args = string.Format("/select,\"{0}\"", filePath);
+                string args = $"/select,\"{filePath}\"";
                 Process.Start("explorer.exe", args);
             }
-            catch { }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Open explorer error");
+            }
         }
 
         private void Window_Drop(object sender, DragEventArgs e)
@@ -359,18 +407,6 @@ namespace PictureView
         private void SplFiles_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2) viewModel.UseSource = true;
-        }
-
-        private void BtnInfo_Click(object sender, RoutedEventArgs e)
-        {
-            FileSystemImage img = viewModel.CurrentImage;
-            BitmapSource crop = (BitmapSource)img?.CroppedImage;
-            string text =
-                $"Image: {img?.Image?.PixelWidth} x {img?.Image?.PixelHeight}\r\n" +
-                $"Crop: {crop?.PixelWidth ?? -1} x {crop?.PixelHeight ?? -1}\r\n" +
-                $"Size: {StdUtils.GetFormattedFileSize(img?.File.Length ?? -1)}";
-
-            MessageBox.Show(text);
         }
     }
 }
