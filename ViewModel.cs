@@ -421,9 +421,9 @@ namespace PictureView
         {
             if (Source != null)
             {
-                return Source.SubType == SubfolderType.All ?
-                    FolderBackward.Get(Source.FullName, beginFile, GetExtensions()) :
-                    FolderSubBackward.Get(Source.FullName, beginFile, GetExtensions());
+                return Source.SubType == SubfolderType.All ?     
+                    FolderSubBackward.Get(Source.FullName, beginFile, GetExtensions()) :                 
+                    FolderBackward.Get(Source.FullName, beginFile, GetExtensions());
             }
 
             if (Sources.Length > 1)
