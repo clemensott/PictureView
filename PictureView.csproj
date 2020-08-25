@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OrdnerDatei\FolderFileLib.csproj" />
+    <ProjectReference Include="..\FolderFileLib\FolderFileLib.csproj" />
     <ProjectReference Include="..\StdOttLib\StdOttFrameworkLib\StdOttFrameworkLib.csproj" />
     <ProjectReference Include="..\StdOttLib\StdOttStandardLib\StdOttStandardLib.csproj" />
   </ItemGroup>
