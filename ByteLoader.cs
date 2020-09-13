@@ -34,7 +34,7 @@ namespace PictureView
             Task.Factory.StartNew(BytesLoad, CancelSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
-        private void BytesLoad()
+        private async Task BytesLoad()
         {
             while (!CancelSource.Token.IsCancellationRequested)
             {
@@ -48,7 +48,7 @@ namespace PictureView
                     currentTuple = queue.Dequeue();
                 }
 
-                currentTuple.image.LoadBytes();
+                await currentTuple.image.LoadBytes();
                 currentTuple.ss.Release();
             }
         }

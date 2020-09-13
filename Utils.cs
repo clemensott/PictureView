@@ -6,26 +6,27 @@ namespace PictureView
 {
     static class Utils
     {
-        public static BitmapImage LoadBitmap(string path)
+        private const string _orientationQuery = "System.Photo.Orientation";
+
+        public static BitmapImage LoadBitmap(Stream stream)
         {
-            return LoadBitmap(File.ReadAllBytes(path), IntSize.Empty);
+            return LoadBitmap(stream, IntSize.Empty);
         }
 
-        public static async Task<BitmapImage> LoadBitmapAsync(string path)
+        public static BitmapImage LoadBitmap(Stream stream, IntSize size)
         {
-            byte[] data = await Task.Run(() => File.ReadAllBytes(path));
+            Rotation rotation;
+            try
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                rotation = LoadImageOrientation(stream);
+            }
+            catch
+            {
+                rotation = Rotation.Rotate0;
+            }
 
-            return LoadBitmap(data, IntSize.Empty);
-        }
-
-        public static BitmapImage LoadBitmap(byte[] data)
-        {
-            return LoadBitmap(data, IntSize.Empty);
-        }
-
-        public static BitmapImage LoadBitmap(byte[] data, IntSize size)
-        {
-            MemoryStream mem = new MemoryStream(data);
+            stream.Seek(0, SeekOrigin.Begin);
             BitmapImage loadImg = new BitmapImage();
 
             loadImg.BeginInit();
@@ -33,11 +34,34 @@ namespace PictureView
             loadImg.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             loadImg.DecodePixelWidth = size.Width;
             loadImg.DecodePixelHeight = size.Height;
-            loadImg.StreamSource = mem;
-            loadImg.Rotation = Rotation.Rotate0;
+            loadImg.StreamSource = stream;
+            loadImg.Rotation = rotation;
             loadImg.EndInit();
 
             return loadImg;
+        }
+
+        public static Rotation LoadImageOrientation(Stream stream)
+        {
+            BitmapFrame bitmapFrame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+            BitmapMetadata bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+
+            if (bitmapMetadata != null && bitmapMetadata.ContainsQuery(_orientationQuery))
+            {
+                object o = bitmapMetadata.GetQuery(_orientationQuery);
+
+                switch ((ushort?)o)
+                {
+                    case 6:
+                        return Rotation.Rotate90;
+                    case 3:
+                        return Rotation.Rotate180;
+                    case 8:
+                        return Rotation.Rotate270;
+                }
+            }
+
+            return Rotation.Rotate0;
         }
     }
 }

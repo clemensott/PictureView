@@ -277,7 +277,7 @@ namespace PictureView
         public ViewModel()
         {
             updateImagesSlowSem = new SemaphoreSlim(1);
-            buffer = new FiFoImagesBuffer(3, 30, 100_000_000);
+            buffer = new FiFoImagesBuffer(3, 15, 20_000_000);
 
             ViewControls = true;
             WindowState = WindowState.Normal;
@@ -359,7 +359,7 @@ namespace PictureView
                 {
                     string dirPath = GetDirectoryPath(path);
 
-                    Source = new Folder(dirPath, Source?.SubType ?? SubfolderType.This);
+                    Source = new Folder(dirPath, Source?.SubType ?? SubfolderType.This, false);
                     oldCurrentImage = dirPath == path ? null : GetImage(path);
                 }
 
@@ -421,8 +421,8 @@ namespace PictureView
         {
             if (Source != null)
             {
-                return Source.SubType == SubfolderType.All ?     
-                    FolderSubBackward.Get(Source.FullName, beginFile, GetExtensions()) :                 
+                return Source.SubType == SubfolderType.All ?
+                    FolderSubBackward.Get(Source.FullName, beginFile, GetExtensions()) :
                     FolderBackward.Get(Source.FullName, beginFile, GetExtensions());
             }
 

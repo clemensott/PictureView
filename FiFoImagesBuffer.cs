@@ -59,7 +59,7 @@ namespace PictureView
                 return;
             }
 
-            while (Count >= MaxCount || (Count > MinCount && dict.Values.Sum(v => v.Data?.Length ?? 0) > MaxBytes))
+            while (Count >= MaxCount || (Count > MinCount && dict.Values.Sum(v => v.DataSize ?? 0) > MaxBytes))
             {
                 string removeKey = queue.Dequeue();
 

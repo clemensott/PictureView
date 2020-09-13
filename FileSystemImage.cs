@@ -1,36 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using StdOttStandard.Linq;
 
 namespace PictureView
 {
     class FileSystemImage : IDisposable, INotifyPropertyChanged
     {
-        private byte[] data;
         private bool isImageOutdated, isImageLoaded;
         private Rect? cropRect;
+        private Stream stream;
         private BitmapSource image;
         private ImageSource croppedImage;
 
         public FileInfo File { get; }
-
-        public byte[] Data
-        {
-            get => data;
-            private set
-            {
-                if (value.BothNullOrSequenceEqual(data)) return;
-
-                data = value;
-                OnPropertyChanged(nameof(Data));
-
-                IsImageOutdated = true;
-            }
-        }
 
         public bool IsImageOutdated
         {
@@ -55,6 +42,8 @@ namespace PictureView
                 OnPropertyChanged(nameof(IsImageLoaded));
             }
         }
+
+        public long? DataSize => stream?.Length;
 
         public Rect? CropRect
         {
@@ -104,29 +93,62 @@ namespace PictureView
             File = file;
 
             IsImageLoaded = false;
-            Data = null;
+            stream = null;
             Image = null;
         }
 
-        public void LoadBytes()
+        public async Task LoadBytes()
         {
             try
             {
                 File.Refresh();
 
-                Data = File.Length < 100000000 ? System.IO.File.ReadAllBytes(File.FullName) : new byte[0];
+                if (File.Length < 100000000)
+                {
+                    Stream destStream = new MemoryStream();
+                    using Stream srcStream = System.IO.File.OpenRead(File.FullName);
+                    await srcStream.CopyToAsync(destStream);
+
+                    Stream oldStream = stream;
+                    stream = destStream;
+
+                    IsImageOutdated = oldStream == null || !SequenceEqual(oldStream, destStream);
+                    oldStream?.Dispose();
+                }
+                else Dispose();
             }
             catch
             {
-                Data = new byte[0];
+                Dispose();
             }
+        }
+
+        private static bool SequenceEqual(Stream stream1, Stream stream2)
+        {
+            if (stream1.Length != stream2.Length) return false;
+
+            stream1.Seek(0, SeekOrigin.Begin);
+            stream2.Seek(0, SeekOrigin.Begin);
+
+            const int bufferSize = 1000;
+            byte[] buffer1 = new byte[bufferSize], buffer2 = new byte[bufferSize];
+
+            while (stream1.Position < stream1.Length)
+            {
+                int read1 = stream1.Read(buffer1, 0, bufferSize);
+                int read2 = stream2.Read(buffer2, 0, bufferSize);
+
+                if (read1 != read2 || !buffer1.Take(read1).SequenceEqual(buffer2.Take(read2))) return false;
+            }
+
+            return true;
         }
 
         public void LoadImage()
         {
             try
             {
-                Image = Utils.LoadBitmap(Data);
+                Image = stream != null ? Utils.LoadBitmap(stream) : null;
             }
             catch
             {
@@ -192,7 +214,8 @@ namespace PictureView
 
         public void Dispose()
         {
-            Data = null;
+            stream?.Dispose();
+            stream = null;
             Image = null;
             CroppedImage = null;
         }
