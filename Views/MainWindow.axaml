@@ -9,7 +9,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PictureView.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/picture-icon.ico"
         Title="{Binding ApplicationTitle}"
         WindowState="{Binding WindowState,Mode=TwoWay}"
         DataContextChanged="OnDataContextChanged"
