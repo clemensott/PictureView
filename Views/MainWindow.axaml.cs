@@ -30,6 +30,7 @@ public partial class MainWindow : Window
         fileExplorer = FileExplorerHelper.GetFileExplorer();
         btnOpenExplorer.IsVisible = fileExplorer != null;
 
+        // TODO: make this work
         DragDrop.SetAllowDrop(this, true);
         DragDrop.DropEvent.AddClassHandler<MainWindow>(OnDrop);
     }
@@ -54,11 +55,11 @@ public partial class MainWindow : Window
     private void OnActivated(object? sender, EventArgs e)
     {
 #if !DEBUG
-        viewModel?.UpdateImages(0);
+        viewModel?.UpdateImages();
 #endif
     }
 
-    private void OnKeyDown(object? sender, KeyEventArgs e)
+    private async void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (FocusManager?.GetFocusedElement()?.GetType() == typeof(TextBox))
         {
@@ -72,7 +73,11 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.W:
-                if (Delete(currentFile, !viewModel.IsDeleteDirect)) viewModel.UpdateImages(0);
+                if (await Delete(currentFile, !viewModel.IsDeleteDirect))
+                {
+                    viewModel.UpdateImages();
+                }
+
                 break;
 
             case Key.Left:
@@ -81,7 +86,7 @@ public partial class MainWindow : Window
                 break;
 
             case Key.S:
-                if (Copy(currentFile, viewModel.Destination, viewModel.CopyCollision))
+                if (await Copy(currentFile, viewModel.Destination, viewModel.CopyCollision))
                 {
                     viewModel.UpdateImages(1);
                 }
@@ -94,7 +99,7 @@ public partial class MainWindow : Window
                 break;
 
             case Key.Delete:
-                if (Delete(currentFile)) viewModel.UpdateImages(0);
+                if (await Delete(currentFile)) viewModel.UpdateImages(0);
                 break;
 
             case Key.Enter:
@@ -110,7 +115,7 @@ public partial class MainWindow : Window
                 break;
 
             case Key.C when e.KeyModifiers.HasFlag(KeyModifiers.Control):
-                CopyToClipboard(viewModel.CurrentImage);
+                await CopyToClipboard(viewModel.CurrentImage);
                 break;
 
             default:
@@ -120,7 +125,7 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private static bool Copy(FileInfo? srcFile, Folder destFolder, FileSystemCollision collision)
+    private async Task<bool> Copy(FileInfo? srcFile, Folder destFolder, FileSystemCollision collision)
     {
         if (srcFile == null || !Directory.Exists(destFolder.Path)) return false;
 
@@ -132,7 +137,7 @@ public partial class MainWindow : Window
             {
                 if (collision == FileSystemCollision.Override) srcFile.CopyTo(destFileName, true);
                 else if (!File.Exists(destFileName)) srcFile.CopyTo(destFileName);
-                else if (collision == FileSystemCollision.Ask && AskCopy(srcFile, destFileName))
+                else if (collision == FileSystemCollision.Ask && await AskCopy(srcFile, destFileName))
                 {
                     srcFile.CopyTo(destFileName, true);
                 }
@@ -153,7 +158,7 @@ public partial class MainWindow : Window
         return false;
     }
 
-    private static bool AskCopy(FileInfo srcFile, string destFileName)
+    private async Task<bool> AskCopy(FileInfo srcFile, string destFileName)
     {
         FileInfo destFile = new FileInfo(destFileName);
         string message =
@@ -162,19 +167,17 @@ public partial class MainWindow : Window
             $"Destination: {destFileName}\r\n" +
             $"Size {StdUtils.GetFormattedFileSize(destFile.Length)}";
 
-        return true;
-        // TODO: implement ask
-        // return MessageBox.Show(message, "Replace?", MessageBoxButton.YesNo,
-        //     MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+        var result = await DialogWindow.Show(this, message, "Replace?", "Yes", "No");
+        return result == DialogWindow.DialogResult.Primary;
     }
 
-    private static bool Delete(FileInfo? file, bool ask = true)
+    private async Task<bool> Delete(FileInfo? file, bool ask = true)
     {
         if (file == null) return false;
 
         try
         {
-            if (ask && !AskDelete(file)) return false;
+            if (ask && !await AskDelete(file)) return false;
 
             file.Delete();
             return true;
@@ -185,22 +188,20 @@ public partial class MainWindow : Window
         }
     }
 
-    private static bool AskDelete(FileInfo file)
+    private async Task<bool> AskDelete(FileInfo file)
     {
         string size = StdUtils.GetFormattedFileSize(file.Length);
         string message = $"Delete?\r\n{file.FullName}\r\nSize: {size}";
 
-        return true;
-        // TODO: implement ask
-        // return MessageBox.Show(message, "Delete?", MessageBoxButton.YesNo,
-        //     MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
+        var result = await DialogWindow.Show(this, message, "Replace?", "Yes", "No");
+        return result == DialogWindow.DialogResult.Primary;
     }
 
     private async Task CopyToClipboard(FileSystemImage? image)
     {
         byte[]? imageData = image?.GetImageBytes();
         if (image == null || imageData == null) return;
-        
+
         try
         {
             TopLevel topLevel = GetTopLevel(this)!;
@@ -229,12 +230,19 @@ public partial class MainWindow : Window
 
     private async void BtnCopy_Click(object? sender, RoutedEventArgs e)
     {
-        // TODO: implemtnt
+        FileInfo? currentFile = viewModel.CurrentImage?.File;
+        if (await Copy(currentFile, viewModel.Destination, viewModel.CopyCollision))
+        {
+            viewModel.UpdateImages(1);
+        }
     }
 
-    private void BtnDelete_Click(object? sender, RoutedEventArgs e)
+    private async void BtnDelete_Click(object? sender, RoutedEventArgs e)
     {
-        if (Delete(viewModel.CurrentImage?.File, !viewModel.IsDeleteDirect)) viewModel.UpdateImages(0);
+        if (await Delete(viewModel.CurrentImage?.File, !viewModel.IsDeleteDirect))
+        {
+            viewModel.UpdateImages();
+        }
     }
 
     private void GidImage_PointerEntered(object? sender, PointerEventArgs e)

@@ -16,7 +16,7 @@ using StdOttStandard.Linq;
 
 namespace PictureView.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public class MainWindowViewModel : ViewModelBase
 {
     private const int opacityStepDelay = 5;
     private const double opacityStep = 0.05;

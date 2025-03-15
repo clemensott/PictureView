@@ -56,6 +56,7 @@
                             Folder="{Binding Destination,Mode=TwoWay}" />
 
             <WrapPanel Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="2">
+                <!-- TODO: add color picker -->
                 <!-- <xctk:ColorPicker Width="100" Margin="5" -->
                 <!--                   SelectedColor="{Binding BackgroundColor,Mode=TwoWay}" /> -->
                 <!-- <ColorPicker Width="100" Height="20"></ColorPicker> -->
@@ -110,10 +111,12 @@
                              Converter={x:Static ObjectConverters.IsNull},FallbackValue={x:True}}" />
             </Grid>
 
+            <!-- TODO: fix cropping/zooming -->
             <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                    Focusable="True" Stretch="Fill"
                    Source="{Binding CroppedImage}" />
 
+            <!-- TODO: check if this is needed -->
             <Image VerticalAlignment="Bottom" HorizontalAlignment="Left"
                    IsVisible="False" Source="{Binding PreviousImage.Image}" />
             <Image VerticalAlignment="Bottom" HorizontalAlignment="Right"
