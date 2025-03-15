@@ -1,57 +1,56 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PictureView
+namespace PictureView;
+
+class AsyncEnumerator<T> : IDisposable
 {
-    class AsyncEnumerator<T> : IDisposable
+    private readonly IEnumerator<T> source;
+    private readonly SemaphoreSlim moveNextSem, asyncTaskSem;
+
+    public bool MovedNext { get; private set; }
+
+    public T Current => source.Current;
+
+    public AsyncEnumerator(IEnumerable<T> enumerable)
     {
-        private readonly IEnumerator<T> source;
-        private readonly SemaphoreSlim moveNextSem, asyncTaskSem;
+        moveNextSem = new SemaphoreSlim(0);
+        asyncTaskSem = new SemaphoreSlim(0);
+        source = enumerable.GetEnumerator();
 
-        public bool MovedNext { get; private set; }
+        Task.Run(MoveNextHandle);
+    }
 
-        public T Current => source.Current;
-
-        public AsyncEnumerator(IEnumerable<T> enumerable)
+    private async Task MoveNextHandle()
+    {
+        do
         {
-            moveNextSem = new SemaphoreSlim(0);
-            asyncTaskSem = new SemaphoreSlim(0);
-            source = enumerable.GetEnumerator();
+            await asyncTaskSem.WaitAsync();
 
-            Task.Run(MoveNextHandle);
-        }
+            MovedNext = source.MoveNext();
 
-        private async Task MoveNextHandle()
-        {
-            do
-            {
-                await asyncTaskSem.WaitAsync();
+            moveNextSem.Release();
 
-                MovedNext = source.MoveNext();
+        } while (MovedNext);
+    }
 
-                moveNextSem.Release();
+    public void Dispose()
+    {
+        source.Dispose();
+    }
 
-            } while (MovedNext);
-        }
+    public async Task<bool> MoveNext()
+    {
+        asyncTaskSem.Release();
+        await moveNextSem.WaitAsync();
 
-        public void Dispose()
-        {
-            source.Dispose();
-        }
+        return MovedNext;
+    }
 
-        public async Task<bool> MoveNext()
-        {
-            asyncTaskSem.Release();
-            await moveNextSem.WaitAsync();
-
-            return MovedNext;
-        }
-
-        public void Reset()
-        {
-            source.Reset();
-        }
+    public void Reset()
+    {
+        source.Reset();
     }
 }

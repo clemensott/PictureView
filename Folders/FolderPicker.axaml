@@ -1,0 +1,25 @@
+<UserControl x:Class="PictureView.Folders.FolderPicker"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:PictureView.Folders"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             x:CompileBindings="True"
+             x:DataType="local:Folder"
+             mc:Ignorable="d"
+             Loaded="OnLoaded">
+    <Grid ColumnDefinitions="*,5,Auto,Auto,Auto">
+        <TextBox Name="tbxPath" VerticalAlignment="Center" TextChanged="TbxPath_TextChanged" />
+
+        <CheckBox Grid.Column="2" Name="cbxSubFolder" Content="Sub folder" VerticalAlignment="Center"
+                  HorizontalAlignment="Center" Margin="0,0,6,0"
+                  IsCheckedChanged="CbxSubfolder_IsCheckedChanged" />
+
+        <Button Grid.Column="3" x:Name="btnChange" Content="Change" Margin="0,0,3,0"
+                Padding="10,3,10,3" Click="BtnChange_Click" VerticalAlignment="Center" />
+        <Button Grid.Column="4" x:Name="btnOpen" Content="Open" Margin="3,0,0,0"
+                Padding="10,3,10,3" Click="BtnOpen_Click" VerticalAlignment="Center" />
+    </Grid>
+</UserControl>

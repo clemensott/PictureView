@@ -1,15 +1,16 @@
-﻿using StdOttStandard.Linq.Sort;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using StdOttStandard.Linq.Sort;
 
-namespace PictureView.EnumerateFiles
-{
-    static class FolderSubForward
+namespace PictureView.EnumerateFiles;
+
+   static class FolderSubForward
     {
-        public static IEnumerable<string> Get(string root, string beginFile, bool startWithBeginFile, string[] extensions)
+        public static IEnumerable<string> Get(string root, string? beginFile, bool startWithBeginFile, string[] extensions)
         {
-            if (beginFile == null) beginFile = string.Empty;
+            beginFile ??= string.Empty;
 
             int compareValue = startWithBeginFile ? 1 : 0;
             string directory = Helper.GetParent(beginFile);
@@ -52,7 +53,7 @@ namespace PictureView.EnumerateFiles
                         continue;
                     }
 
-                    foreach (string brother in SortUtils.HeapSort(parentDirs, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
+                    foreach (string brother in parentDirs.HeapSort(Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
                     {
                         foreach (string file in EnumerateFilesRecursive(brother, extensions))
                         {
@@ -85,10 +86,10 @@ namespace PictureView.EnumerateFiles
             }
             catch
             {
-                enumeration = new string[0];
+                enumeration = Array.Empty<string>();
             }
 
-            foreach (string file in SortUtils.HeapSort(enumeration, Helper.CompareFilePath))
+            foreach (string file in enumeration.HeapSort(Helper.CompareFilePath))
             {
                 yield return file;
             }
@@ -99,10 +100,10 @@ namespace PictureView.EnumerateFiles
             }
             catch
             {
-                enumeration = new string[0];
+                enumeration = Array.Empty<string>();
             }
 
-            foreach (string subDir in SortUtils.HeapSort(enumeration, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
+            foreach (string subDir in enumeration.HeapSort(Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
             {
                 foreach (string file in EnumerateFilesRecursive(subDir, extensions))
                 {
@@ -112,4 +113,3 @@ namespace PictureView.EnumerateFiles
         }
 
     }
-}

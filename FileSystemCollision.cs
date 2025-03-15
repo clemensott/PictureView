@@ -1,7 +1,8 @@
-﻿namespace PictureView
+namespace PictureView;
+
+public enum FileSystemCollision
 {
-    enum FileSystemCollision
-    {
-        Ask, Override, DoNothing
-    }
+    Ask,
+    Override,
+    DoNothing
 }

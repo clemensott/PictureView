@@ -1,17 +1,17 @@
-﻿using StdOttStandard.Linq.Sort;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using StdOttStandard.Linq.Sort;
 
-namespace PictureView.EnumerateFiles
-{
-    static class FolderSubBackward
+namespace PictureView.EnumerateFiles;
+
+static class FolderSubBackward
     {
-        public static IEnumerable<string> Get(string root, string beginFile, string[] extensions)
+        public static IEnumerable<string> Get(string root, string? beginFile, string[] extensions)
         {
-            if (beginFile == null) beginFile = string.Empty;
-
             IEnumerable<string> dirFiles;
+            beginFile ??= string.Empty;
             string directory = Helper.GetParent(beginFile);
 
             if (directory.Length > 0)
@@ -27,7 +27,7 @@ namespace PictureView.EnumerateFiles
                     yield break;
                 }
 
-                foreach (string path in SortUtils.HeapSortDesc(dirFiles, Helper.CompareFilePath))
+                foreach (string path in dirFiles.HeapSortDesc(Helper.CompareFilePath))
                 {
                     yield return path;
                 }
@@ -52,7 +52,7 @@ namespace PictureView.EnumerateFiles
                         continue;
                     }
 
-                    foreach (string brother in SortUtils.HeapSortDesc(parentDirs, Helper.CompareDirectoryPath))
+                    foreach (string brother in parentDirs.HeapSortDesc(Helper.CompareDirectoryPath))
                     {
                         foreach (string file in EnumerateFilesReverseRecursive(brother, extensions))
                         {
@@ -71,7 +71,7 @@ namespace PictureView.EnumerateFiles
                         yield break;
                     }
 
-                    foreach (string file in SortUtils.HeapSortDesc(dirFiles, Helper.CompareFilePath))
+                    foreach (string file in dirFiles.HeapSortDesc(Helper.CompareFilePath))
                     {
                         yield return file;
                     }
@@ -90,18 +90,18 @@ namespace PictureView.EnumerateFiles
 
         private static IEnumerable<string> EnumerateFilesReverseRecursive(string dir, string[] extensions)
         {
-            IEnumerable<string> enummeration;
+            IEnumerable<string> enumeration;
 
             try
             {
-                enummeration = Directory.GetDirectories(dir);
+                enumeration = Directory.GetDirectories(dir);
             }
             catch
             {
-                enummeration = new string[0];
+                enumeration = Array.Empty<string>();
             }
 
-            foreach (string subDir in SortUtils.HeapSortDesc(enummeration, Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
+            foreach (string subDir in enumeration.HeapSortDesc(Helper.NormalizeDirectoryPath, Helper.CompareDirectoryPath))
             {
                 foreach (string file in EnumerateFilesReverseRecursive(subDir, extensions))
                 {
@@ -111,19 +111,18 @@ namespace PictureView.EnumerateFiles
 
             try
             {
-                enummeration = Directory.GetFiles(dir);
+                enumeration = Directory.GetFiles(dir);
 
-                Helper.FilterFiles(ref enummeration, extensions);
+                Helper.FilterFiles(ref enumeration, extensions);
             }
             catch
             {
-                enummeration = new string[0];
+                enumeration = Array.Empty<string>();
             }
 
-            foreach (string file in SortUtils.HeapSortDesc(enummeration, Helper.CompareFilePath))
+            foreach (string file in enumeration.HeapSortDesc(Helper.CompareFilePath))
             {
                 yield return file;
             }
         }
     }
-}

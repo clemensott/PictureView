@@ -1,0 +1,188 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PictureView.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:c="using:PictureView.Converters"
+        xmlns:f="using:PictureView.Folders"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="PictureView.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding ApplicationTitle}"
+        WindowState="{Binding WindowState,Mode=TwoWay}"
+        DataContextChanged="OnDataContextChanged"
+        Activated="OnActivated"
+        KeyDown="OnKeyDown">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Window.Resources>
+        <system:Double x:Key="btnHeight">100</system:Double>
+        <Thickness x:Key="btnLeftPadding">5,5,8,5</Thickness>
+        <Thickness x:Key="btnRightPadding">8,5,5,5</Thickness>
+        <Thickness x:Key="btnMargin">5</Thickness>
+
+        <c:FileSystemCollisionConverter x:Key="fscCon"/>
+        <c:FileSizeFormatConverter x:Key="fileSizeCon"/>
+        <c:RoundNumberConverter x:Key="pixelRounder" Decimals="1" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*"
+              IsVisible="{Binding ElementName=tbnSettings,Path=IsChecked}">
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Source: " Margin="5"
+                       VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Destination: " Margin="5"
+                       VerticalAlignment="Center" HorizontalAlignment="Right" />
+
+            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
+                        IsVisible="{Binding !UseSource}">
+                <TextBlock Text="{Binding Sources.Length,FallbackValue='0'}" />
+                <TextBlock Text=" File(s)" />
+            </StackPanel>
+
+            <f:FolderPicker Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="3"
+                            Folder="{Binding Source,Mode=TwoWay}"
+                            IsVisible="{Binding UseSource}" />
+
+            <f:FolderPicker Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="3"
+                            WithSubFolderSelection="False"
+                            Folder="{Binding Destination,Mode=TwoWay}" />
+
+            <WrapPanel Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="2">
+                <!-- <xctk:ColorPicker Width="100" Margin="5" -->
+                <!--                   SelectedColor="{Binding BackgroundColor,Mode=TwoWay}" /> -->
+                <!-- <ColorPicker Width="100" Height="20"></ColorPicker> -->
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="On copy collision:" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="3" />
+                    <RadioButton Content="Ask" VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=Ask}" />
+                    <RadioButton Content="Override" VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=Override}" />
+                    <RadioButton Content="Do nothing" VerticalAlignment="Center" Margin="3"
+                                 IsChecked="{Binding CopyCollision,Mode=TwoWay,
+                                   Converter={StaticResource fscCon},ConverterParameter=DoNothing}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,0,0,0"
+                            IsVisible="{Binding UseSource}">
+                    <TextBlock Text="Search Pattern" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="3" />
+                    <TextBox VerticalAlignment="Center" Margin="3" Width="200"
+                             Text="{Binding Extensions,Mode=TwoWay}" />
+                </StackPanel>
+
+                <Button Content="Copy &amp; Next" VerticalAlignment="Center"
+                        Width="100" Margin="5,3,0,3" Click="BtnCopy_Click" />
+                <Button Content="Delete" Width="100" VerticalAlignment="Center"
+                        Margin="5,3,0,3" Click="BtnDelete_Click" />
+
+                <CheckBox Content="Delete directly" VerticalAlignment="Center" Margin="5,5,0,5"
+                          IsChecked="{Binding IsDeleteDirect,Mode=TwoWay}" />
+            </WrapPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" Name="gidImage" Background="{Binding BackgroundBrush}"
+              PointerEntered="GidImage_PointerEntered" PointerExited="GidImage_PointerExited"
+              PointerWheelChanged="GidImage_PointerWheelChanged" PointerPressed="GidImage_PointerPressed"
+              PointerReleased="GidImage_PointerReleased" SizeChanged="GidImage_SizeChanged">
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
+                  DataContext="{Binding CurrentImage}"
+                  IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="Loading..." FontSize="20" IsVisible="{Binding !IsImageLoaded}"/>
+            </Grid>
+
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
+                  DataContext="{Binding CurrentImage}"
+                  IsVisible="{Binding !!IsImageLoaded,FallbackValue={x:True}}">
+                <TextBlock Text="No Image" FontSize="20"
+                           IsVisible="{Binding Image,
+                             Converter={x:Static ObjectConverters.IsNull},FallbackValue={x:True}}" />
+            </Grid>
+
+            <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                   Focusable="True" Stretch="Fill"
+                   Source="{Binding CroppedImage}" />
+
+            <Image VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   IsVisible="False" Source="{Binding PreviousImage.Image}" />
+            <Image VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                   IsVisible="False" Source="{Binding NextImage.Image}" />
+
+            <Grid Opacity="{Binding ControlsOpacity}"
+                  PointerEntered="GidControls_PointerEntered" PointerExited="GidControls_PointerExited">
+                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White" 
+                                Margin="5,0,0,5"
+                                DataContext="{Binding CurrentImage.Image}"
+                                IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="Image size: " />
+                        <TextBlock Text="{Binding Size.Width,FallbackValue='-1'}" />
+                        <TextBlock Text=" x " />
+                        <TextBlock Text="{Binding Size.Height,FallbackValue='-1'}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White"
+                                Margin="5,0,0,5" DataContext="{Binding CropRect}"
+                                IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="Crop rect: X=" />
+                        <TextBlock Text="{Binding Value.X, Converter={StaticResource pixelRounder},
+                                     FallbackValue='-1'}" />
+                        <TextBlock Text=" Y=" />
+                        <TextBlock Text="{Binding Value.Y, Converter={StaticResource pixelRounder},
+                                     FallbackValue='-1'}" />
+                        <TextBlock Text=" W=" />
+                        <TextBlock Text="{Binding Value.Width, Converter={StaticResource pixelRounder},
+                                     FallbackValue='-1'}" />
+                        <TextBlock Text=" H=" />
+                        <TextBlock Text="{Binding Value.Height, Converter={StaticResource pixelRounder},
+                                     FallbackValue='-1'}" />
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White" Margin="5,0,0,5"
+                                DataContext="{Binding CurrentImage}"
+                                IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="File size: " />
+                        <TextBlock Text="{Binding File.Length,
+                                     Converter={StaticResource fileSizeCon},FallbackValue='-1'}" />
+                    </StackPanel>
+                    
+                    <TextBlock HorizontalAlignment="Left" Background="White" Margin="5,0,0,5"
+                               DataContext="{Binding CurrentImage}"
+                               IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}"
+                               Text="{Binding File.FullName,FallbackValue=''}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+                    <Button x:Name="btnOpenExplorer" Content="Open in explorer" VerticalAlignment="Center" Width="150" Padding="5"
+                            Background="LightGray" HorizontalContentAlignment="Center" Click="BtnExplorer_Click" />
+                    <ToggleButton x:Name="tbnSettings" Content="Settings" VerticalAlignment="Top"
+                                  HorizontalAlignment="Left" Padding="5" Width="100" Background="LightGray"
+                                  HorizontalContentAlignment="Center" Margin="{StaticResource btnMargin}" />
+                    <ToggleButton Content="Fullscreen" Padding="5" Margin="{StaticResource btnMargin}"
+                                  Width="100" Background="LightGray" HorizontalContentAlignment="Center"
+                                  IsChecked="{Binding IsFullscreen,Mode=TwoWay}" />
+                </StackPanel>
+
+                <Button Content="&lt;" VerticalAlignment="Center" HorizontalAlignment="Left" Background="LightGray"
+                        VerticalContentAlignment="Center"
+                        Height="{StaticResource btnHeight}" Padding="{StaticResource btnLeftPadding}"
+                        Margin="{StaticResource btnMargin}" Click="BtnPrevious_Click" />
+                <Button Content="&gt;" VerticalAlignment="Center" HorizontalAlignment="Right" Background="LightGray"
+                        VerticalContentAlignment="Center"
+                        Height="{StaticResource btnHeight}" Padding="{StaticResource btnRightPadding}"
+                        Margin="{StaticResource btnMargin}" Click="BtnNext_Click" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
