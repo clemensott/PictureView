@@ -116,12 +116,6 @@
                    Focusable="True" Stretch="Fill"
                    Source="{Binding CroppedImage}" />
 
-            <!-- TODO: check if this is needed -->
-            <Image VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                   IsVisible="False" Source="{Binding PreviousImage.Image}" />
-            <Image VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                   IsVisible="False" Source="{Binding NextImage.Image}" />
-
             <Grid Opacity="{Binding ControlsOpacity}"
                   PointerEntered="GidControls_PointerEntered" PointerExited="GidControls_PointerExited">
                 <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
