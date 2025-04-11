@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using PictureView.EnumerateFiles;
 using PictureView.Folders;
+using PictureView.Models;
 using StdOttStandard;
 using StdOttStandard.Linq;
 
@@ -36,7 +38,6 @@ public class MainWindowViewModel : ViewModelBase
     private double controlsOpacity;
     private string extensions;
     private string[]? sources;
-    private Color backgroundColor;
     private WindowState windowState;
     private readonly FiFoImagesBuffer buffer;
     private Rect? cropRect;
@@ -148,22 +149,8 @@ public class MainWindowViewModel : ViewModelBase
             else UpdateImages(0, sources[0]);
         }
     }
-
-    public Color BackgroundColor
-    {
-        get => backgroundColor;
-        set
-        {
-            if (value == backgroundColor) return;
-
-            backgroundColor = value;
-
-            OnPropertyChanged(nameof(BackgroundColor));
-            OnPropertyChanged(nameof(BackgroundBrush));
-        }
-    }
-
-    public Brush BackgroundBrush => new SolidColorBrush(BackgroundColor);
+    
+    public ObservableCollection<ColorName> BackgroundColors { get; }
 
     public FileSystemImage? CurrentImage
     {
@@ -280,7 +267,17 @@ public class MainWindowViewModel : ViewModelBase
         buffer = new FiFoImagesBuffer(3, 15, 20_000_000);
 
         ViewControls = true;
-        BackgroundColor = Colors.White;
+        BackgroundColors = [
+            new ColorName("White", Brushes.White),
+            new ColorName("Black", Brushes.Black),
+            new ColorName("Gray", Brushes.Gray),
+            new ColorName("Blue", Brushes.Blue),
+            new ColorName("Green", Brushes.Green),
+            new ColorName("Red", Brushes.Red),
+            new ColorName("Yellow", Brushes.Yellow),
+            new ColorName("Orange", Brushes.Orange),
+            new ColorName("Purple", Brushes.Purple),
+        ];
         CopyCollision = FileSystemCollision.Ask;
         Extensions = ".jpg|.jpeg|.jpe|.gif|.tiff|.ico|.png|.bmp";
         Source = new Folder(string.Empty, SubfolderType.This);

@@ -46,7 +46,6 @@ public partial class MainWindow : Window
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
         viewModel = (MainWindowViewModel)DataContext!;
-        viewModel.BackgroundColor = Background is SolidColorBrush brush ? brush.Color : Colors.White;
         viewModel.ViewControls = false;
 
         viewModel.Sources = Environment.GetCommandLineArgs().Skip(1).ToArray();
@@ -379,5 +378,12 @@ public partial class MainWindow : Window
     private void BtnNext_Click(object? sender, RoutedEventArgs e)
     {
         viewModel.UpdateImages(1);
+    }
+
+    private async void CbxBackgroundColor_OnDataContextChanged(object? sender, EventArgs e)
+    {
+        // Workaround to auto select first element in combo box
+        while (cbxBackgroundColor.Items.Count == 0) await Task.Delay(100);
+        cbxBackgroundColor.SelectedIndex = 0;
     }
 }

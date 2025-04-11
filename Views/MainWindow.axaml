@@ -6,6 +6,7 @@
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         xmlns:c="using:PictureView.Converters"
         xmlns:f="using:PictureView.Folders"
+        xmlns:m="using:PictureView.Models"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PictureView.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -28,8 +29,8 @@
         <Thickness x:Key="btnRightPadding">8,5,5,5</Thickness>
         <Thickness x:Key="btnMargin">5</Thickness>
 
-        <c:FileSystemCollisionConverter x:Key="fscCon"/>
-        <c:FileSizeFormatConverter x:Key="fileSizeCon"/>
+        <c:FileSystemCollisionConverter x:Key="fscCon" />
+        <c:FileSizeFormatConverter x:Key="fileSizeCon" />
         <c:RoundNumberConverter x:Key="pixelRounder" Decimals="1" />
     </Window.Resources>
 
@@ -56,10 +57,24 @@
                             Folder="{Binding Destination,Mode=TwoWay}" />
 
             <WrapPanel Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="2">
-                <!-- TODO: add color picker -->
-                <!-- <xctk:ColorPicker Width="100" Margin="5" -->
-                <!--                   SelectedColor="{Binding BackgroundColor,Mode=TwoWay}" /> -->
-                <!-- <ColorPicker Width="100" Height="20"></ColorPicker> -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Background Color:" FontWeight="Bold"
+                               VerticalAlignment="Center" Margin="3" />
+                    <ComboBox Name="cbxBackgroundColor" VerticalAlignment="Center" Margin="3"
+                              ItemsSource="{Binding BackgroundColors}"
+                              DataContextChanged="CbxBackgroundColor_OnDataContextChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border BorderThickness="1" BorderBrush="Black">
+                                        <Rectangle Width="15" Height="15" Fill="{Binding Brush}" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="On copy collision:" FontWeight="Bold"
@@ -93,14 +108,15 @@
             </WrapPanel>
         </Grid>
 
-        <Grid Grid.Row="1" Name="gidImage" Background="{Binding BackgroundBrush}"
+        <Grid Grid.Row="1" Name="gidImage" 
+              Background="{Binding ElementName=cbxBackgroundColor,Path=((m:ColorName)SelectedItem).Brush}"
               PointerEntered="GidImage_PointerEntered" PointerExited="GidImage_PointerExited"
               PointerWheelChanged="GidImage_PointerWheelChanged" PointerPressed="GidImage_PointerPressed"
               PointerReleased="GidImage_PointerReleased" SizeChanged="GidImage_SizeChanged">
             <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
                   DataContext="{Binding CurrentImage}"
                   IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
-                <TextBlock Text="Loading..." FontSize="20" IsVisible="{Binding !IsImageLoaded}"/>
+                <TextBlock Text="Loading..." FontSize="20" IsVisible="{Binding !IsImageLoaded}" />
             </Grid>
 
             <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -113,13 +129,13 @@
 
             <!-- TODO: fix cropping/zooming -->
             <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                   Focusable="True" Stretch="Fill"
+                   Focusable="True" Stretch="Uniform"
                    Source="{Binding CroppedImage}" />
 
             <Grid Opacity="{Binding ControlsOpacity}"
                   PointerEntered="GidControls_PointerEntered" PointerExited="GidControls_PointerExited">
                 <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White" 
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White"
                                 Margin="5,0,0,5"
                                 DataContext="{Binding CurrentImage.Image}"
                                 IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -128,32 +144,37 @@
                         <TextBlock Text=" x " />
                         <TextBlock Text="{Binding Size.Height,FallbackValue='-1'}" />
                     </StackPanel>
-                    
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White"
                                 Margin="5,0,0,5" DataContext="{Binding CropRect}"
                                 IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
                         <TextBlock Text="Crop rect: X=" />
-                        <TextBlock Text="{Binding Value.X, Converter={StaticResource pixelRounder},
+                        <TextBlock
+                            Text="{Binding Value.X, Converter={StaticResource pixelRounder},
                                      FallbackValue='-1'}" />
                         <TextBlock Text=" Y=" />
-                        <TextBlock Text="{Binding Value.Y, Converter={StaticResource pixelRounder},
+                        <TextBlock
+                            Text="{Binding Value.Y, Converter={StaticResource pixelRounder},
                                      FallbackValue='-1'}" />
                         <TextBlock Text=" W=" />
-                        <TextBlock Text="{Binding Value.Width, Converter={StaticResource pixelRounder},
+                        <TextBlock
+                            Text="{Binding Value.Width, Converter={StaticResource pixelRounder},
                                      FallbackValue='-1'}" />
                         <TextBlock Text=" H=" />
-                        <TextBlock Text="{Binding Value.Height, Converter={StaticResource pixelRounder},
+                        <TextBlock
+                            Text="{Binding Value.Height, Converter={StaticResource pixelRounder},
                                      FallbackValue='-1'}" />
                     </StackPanel>
-                    
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Background="White" Margin="5,0,0,5"
                                 DataContext="{Binding CurrentImage}"
                                 IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
                         <TextBlock Text="File size: " />
-                        <TextBlock Text="{Binding File.Length,
+                        <TextBlock
+                            Text="{Binding File.Length,
                                      Converter={StaticResource fileSizeCon},FallbackValue='-1'}" />
                     </StackPanel>
-                    
+
                     <TextBlock HorizontalAlignment="Left" Background="White" Margin="5,0,0,5"
                                DataContext="{Binding CurrentImage}"
                                IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}"
@@ -161,7 +182,8 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <Button x:Name="btnOpenExplorer" Content="Open in explorer" VerticalAlignment="Center" Width="150" Padding="5"
+                    <Button x:Name="btnOpenExplorer" Content="Open in explorer" VerticalAlignment="Center" Width="150"
+                            Padding="5"
                             Background="LightGray" HorizontalContentAlignment="Center" Click="BtnExplorer_Click" />
                     <ToggleButton x:Name="tbnSettings" Content="Settings" VerticalAlignment="Top"
                                   HorizontalAlignment="Left" Padding="5" Width="100" Background="LightGray"
