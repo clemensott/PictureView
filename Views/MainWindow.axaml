@@ -127,7 +127,6 @@
                              Converter={x:Static ObjectConverters.IsNull},FallbackValue={x:True}}" />
             </Grid>
 
-            <!-- TODO: fix cropping/zooming -->
             <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                    Focusable="True" Stretch="Uniform"
                    Source="{Binding CroppedImage}" />

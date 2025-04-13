@@ -328,6 +328,9 @@ public partial class MainWindow : Window
 
         viewModel.CropRect = Zoom(gidImage.Bounds.Width / gidImage.Bounds.Height, rect,
             new Point(pixelOffsetX, pixelOffsetY), zoomFactorOffset, new Point(pixelZoomPointX, pixelZoomPointY));
+
+        // force image to recalculate possible size
+        imgCurrent.Margin = imgCurrent.Margin.Left > 0 ? new Thickness() : new Thickness(0.1);
     }
 
     private static Rect Zoom(double gridRatio, Rect rect, Point offset,
