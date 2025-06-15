@@ -115,7 +115,7 @@
               PointerReleased="GidImage_PointerReleased" SizeChanged="GidImage_SizeChanged">
             <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
                   DataContext="{Binding CurrentImage}"
-                  IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}">
+                  IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull},FallbackValue=false}">
                 <TextBlock Text="Loading..." FontSize="20" IsVisible="{Binding !IsImageLoaded}" />
             </Grid>
 
@@ -128,7 +128,7 @@
             </Grid>
 
             <Image Name="imgCurrent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                   Focusable="True" Stretch="Uniform"
+                   Focusable="True" Stretch="Uniform" Margin="{Binding ImgMargin}"
                    Source="{Binding CroppedImage}" />
 
             <Grid Opacity="{Binding ControlsOpacity}"

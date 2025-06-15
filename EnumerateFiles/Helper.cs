@@ -7,6 +7,13 @@ namespace PictureView.EnumerateFiles;
 
 static class Helper
 {
+    private static readonly StringComparison comparisonType = GetStringComparison();
+
+    private static StringComparison GetStringComparison()
+    {
+        return OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+    }
+
     public static string UniformDirectorySeparatorChar(string path)
     {
         return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
@@ -40,19 +47,19 @@ static class Helper
 
         for (int i = 0; i < path1Parts.Length && i < path2Parts.Length; i++)
         {
-            int compare = string.Compare(path1Parts[i], path2Parts[i], StringComparison.OrdinalIgnoreCase);
+            int compare = string.Compare(path1Parts[i], path2Parts[i], comparisonType);
 
             if (compare != 0) return compare;
         }
 
-        return 0;
+        return path1Parts.Length.CompareTo(path2Parts.Length);
     }
 
     public static int CompareFilePath(string path1, string path2)
     {
         int compareDirs = CompareDirectoryPath(GetParent(path1), GetParent(path2));
 
-        return compareDirs != 0 ? compareDirs : string.Compare(path1, path2, StringComparison.OrdinalIgnoreCase);
+        return compareDirs != 0 ? compareDirs : string.Compare(path1, path2, comparisonType);
     }
 
     public static IEnumerable<string> GetPathSteps(string currentPath, string destPath)

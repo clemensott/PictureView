@@ -41,8 +41,9 @@ public class MainWindowViewModel : ViewModelBase
     private WindowState windowState;
     private readonly FiFoImagesBuffer buffer;
     private Rect? cropRect;
+    private Thickness imgMargin;
     private FileSystemImage? currentImage, previousImage, nextImage;
-    private Folder source, destination;
+    private Folders.Folder source, destination;
     private FileSystemCollision copyCollision;
 
     public bool IsDeleteDirect
@@ -144,13 +145,25 @@ public class MainWindowViewModel : ViewModelBase
 
             if (sources?.Length == 0) ViewControls = true;
 
-            UseSource = sources == null;
+            UseSource = sources is not { Length: > 1 };
             if (sources is not { Length: 1 }) UpdateImages();
             else UpdateImages(0, sources[0]);
         }
     }
     
     public ObservableCollection<ColorName> BackgroundColors { get; }
+
+    public Thickness ImgMargin
+    {
+        get => imgMargin;
+        set
+        {
+            if(value == imgMargin) return;
+            
+            imgMargin = value;
+            OnPropertyChanged(nameof(ImgMargin));
+        }
+    } 
 
     public FileSystemImage? CurrentImage
     {
@@ -190,6 +203,8 @@ public class MainWindowViewModel : ViewModelBase
                     new PixelRect((int)value?.X!, (int)value?.Y!, (int)value?.Width!, (int)value?.Height!);
             }
             else CroppedImage.SourceRect = new PixelRect();
+
+            ForceRerender();
         }
     }
 
@@ -219,7 +234,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public Folder Source
+    public Folders.Folder Source
     {
         get => source;
         set
@@ -234,7 +249,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public Folder Destination
+    public Folders.Folder Destination
     {
         get => destination;
         set
@@ -280,14 +295,18 @@ public class MainWindowViewModel : ViewModelBase
         ];
         CopyCollision = FileSystemCollision.Ask;
         Extensions = ".jpg|.jpeg|.jpe|.gif|.tiff|.ico|.png|.bmp";
-        Source = new Folder(string.Empty, SubfolderType.This);
-        Destination = new Folder(string.Empty, SubfolderType.This);
+        Source = new Folders.Folder(string.Empty, SubfolderType.This);
+        Destination = new Folders.Folder(string.Empty, SubfolderType.This);
         CroppedImage = new CroppedBitmap();
     }
 
     private void CurrentImage_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(CurrentImage.Image)) CroppedImage.Source = CurrentImage?.Image;
+        if (e.PropertyName == nameof(CurrentImage.Image))
+        {
+            CroppedImage.Source = CurrentImage?.Image;
+            ForceRerender();
+        }
     }
 
     private static Rect? Limit(Rect? rect, Size? maxSize)
@@ -344,6 +363,12 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         isUpdatingOpacity = false;
+    }
+
+    private void ForceRerender()
+    {
+        // force image to recalculate possible size
+        ImgMargin = ImgMargin.Left > 0 ? new Thickness() : new Thickness(0.1);
     }
 
     public void ResetZoom()
@@ -410,7 +435,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             return Source.SubType == SubfolderType.All
                 ? FolderSubForward.Get(Source.Path, beginFile, startWithBeginFile, GetExtensions())
-                : FolderForward.Get(Source.Path, beginFile, startWithBeginFile, GetExtensions());
+                : FolderOnly.GetForward(Source.Path, beginFile, startWithBeginFile, GetExtensions());
         }
 
         string[]? sources = Sources;
@@ -427,7 +452,7 @@ public class MainWindowViewModel : ViewModelBase
 
         try
         {
-            return FolderForward.Get(GetDirectoryPath(sources[0]),
+            return FolderOnly.GetForward(GetDirectoryPath(sources[0]),
                 beginFile, startWithBeginFile, GetExtensions());
         }
         catch
@@ -442,7 +467,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             return Source.SubType == SubfolderType.All
                 ? FolderSubBackward.Get(Source.Path, beginFile, GetExtensions())
-                : FolderBackward.Get(Source.Path, beginFile, GetExtensions());
+                : FolderOnly.GetBackwards(Source.Path, beginFile, GetExtensions());
         }
 
         string[]? sources = Sources;
@@ -457,7 +482,7 @@ public class MainWindowViewModel : ViewModelBase
 
         try
         {
-            return FolderBackward.Get(GetDirectoryPath(sources[0]), beginFile, GetExtensions());
+            return FolderOnly.GetBackwards(GetDirectoryPath(sources[0]), beginFile, GetExtensions());
         }
         catch
         {

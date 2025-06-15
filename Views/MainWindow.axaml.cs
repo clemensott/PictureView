@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using PictureView.Folders;
 using PictureView.Folders.FileExplorer;
 using PictureView.ViewModels;
@@ -16,7 +18,7 @@ namespace PictureView.Views;
 
 public partial class MainWindow : Window
 {
-    private const double zoomSpeed = 0.01, maxZoomFactor = 30;
+    private const double zoomSpeed = 0.05, maxZoomFactor = 30;
 
     private MainWindowViewModel viewModel;
     private readonly IFileExplorer? fileExplorer;
@@ -39,7 +41,8 @@ public partial class MainWindow : Window
     {
         if (e.Data.Contains(DataFormats.Files))
         {
-            sender.viewModel.Sources = (string[])e.Data.Get(DataFormats.Files)!;
+            var files = (IEnumerable<IStorageItem>?)e.Data.Get(DataFormats.Files);
+            sender.viewModel.Sources = files?.Select(f => f.Path.AbsolutePath).ToArray();
         }
     }
 
@@ -328,9 +331,6 @@ public partial class MainWindow : Window
 
         viewModel.CropRect = Zoom(gidImage.Bounds.Width / gidImage.Bounds.Height, rect,
             new Point(pixelOffsetX, pixelOffsetY), zoomFactorOffset, new Point(pixelZoomPointX, pixelZoomPointY));
-
-        // force image to recalculate possible size
-        imgCurrent.Margin = imgCurrent.Margin.Left > 0 ? new Thickness() : new Thickness(0.1);
     }
 
     private static Rect Zoom(double gridRatio, Rect rect, Point offset,
