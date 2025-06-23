@@ -115,7 +115,7 @@
               PointerReleased="GidImage_PointerReleased" SizeChanged="GidImage_SizeChanged">
             <Grid VerticalAlignment="Center" HorizontalAlignment="Center"
                   DataContext="{Binding CurrentImage}"
-                  IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull},FallbackValue=false}">
+                  IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull},FallbackValue={x:False}}">
                 <TextBlock Text="Loading..." FontSize="20" IsVisible="{Binding !IsImageLoaded}" />
             </Grid>
 

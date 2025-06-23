@@ -43,7 +43,7 @@ public class MainWindowViewModel : ViewModelBase
     private Rect? cropRect;
     private Thickness imgMargin;
     private FileSystemImage? currentImage, previousImage, nextImage;
-    private Folders.Folder source, destination;
+    private Folder source, destination;
     private FileSystemCollision copyCollision;
 
     public bool IsDeleteDirect
@@ -234,7 +234,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public Folders.Folder Source
+    public Folder Source
     {
         get => source;
         set
@@ -249,7 +249,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public Folders.Folder Destination
+    public Folder Destination
     {
         get => destination;
         set
@@ -295,8 +295,8 @@ public class MainWindowViewModel : ViewModelBase
         ];
         CopyCollision = FileSystemCollision.Ask;
         Extensions = ".jpg|.jpeg|.jpe|.gif|.tiff|.ico|.png|.bmp";
-        Source = new Folders.Folder(string.Empty, SubfolderType.This);
-        Destination = new Folders.Folder(string.Empty, SubfolderType.This);
+        Source = new Folder(string.Empty, SubfolderType.This);
+        Destination = new Folder(string.Empty, SubfolderType.This);
         CroppedImage = new CroppedBitmap();
     }
 
