@@ -1,85 +1,70 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PictureView
+namespace PictureView;
+
+class ByteLoader
 {
-    class ByteLoader
+    private (FileSystemImage image, SemaphoreSlim ss) currentTuple;
+    private readonly Queue<(FileSystemImage image, SemaphoreSlim ss)> queue;
+
+    public CancellationTokenSource CancelSource { get; }
+
+    public ByteLoader()
     {
-        private static ByteLoader instance;
+        queue = new Queue<(FileSystemImage image, SemaphoreSlim ss)>();
+        CancelSource = new CancellationTokenSource();
 
-        public static ByteLoader Current
+        Task.Factory.StartNew(BytesLoad, CancelSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    private async Task BytesLoad()
+    {
+        while (!CancelSource.Token.IsCancellationRequested)
         {
-            get
-            {
-                if (instance == null) instance = new ByteLoader();
-
-                return instance;
-            }
-        }
-
-        private (FileSystemImage image, SemaphoreSlim ss) currentTuple;
-        private readonly Queue<(FileSystemImage image, SemaphoreSlim ss)> queue;
-
-        public CancellationTokenSource CancelSource { get; }
-
-        private ByteLoader()
-        {
-            queue = new Queue<(FileSystemImage image, SemaphoreSlim ss)>();
-            CancelSource = new CancellationTokenSource();
-
-            Task.Factory.StartNew(BytesLoad, CancelSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        private async Task BytesLoad()
-        {
-            while (!CancelSource.Token.IsCancellationRequested)
-            {
-                lock (queue)
-                {
-                    while (queue.Count == 0)
-                    {
-                        Monitor.Wait(queue);
-                    }
-
-                    currentTuple = queue.Dequeue();
-                }
-
-                await currentTuple.image.LoadBytes();
-                currentTuple.ss.Release();
-            }
-        }
-
-        public async Task<bool> Load(FileSystemImage image)
-        {
-            if (image == null) return false;
-
-            SemaphoreSlim ss = new SemaphoreSlim(0, 1);
-
             lock (queue)
             {
-                if (Contains(image)) return false;
+                while (queue.Count == 0)
+                {
+                    Monitor.Wait(queue);
+                }
 
-                queue.Enqueue((image, ss));
-
-                Monitor.Pulse(queue);
+                currentTuple = queue.Dequeue();
             }
 
-            await ss.WaitAsync();
-
-            ss.Dispose();
-
-            return true;
+            await currentTuple.image.LoadBytes();
+            currentTuple.ss.Release();
         }
+    }
 
-        private bool Contains(FileSystemImage image)
+    public async Task<bool> Load(FileSystemImage? image)
+    {
+        if (image == null) return false;
+
+        SemaphoreSlim ss = new SemaphoreSlim(0, 1);
+
+        lock (queue)
         {
-            if (image == currentTuple.image) return true;
+            if (Contains(image)) return false;
 
-            return queue.Any(t => t.image == image);
+            queue.Enqueue((image, ss));
+
+            Monitor.Pulse(queue);
         }
+
+        await ss.WaitAsync();
+
+        ss.Dispose();
+
+        return true;
+    }
+
+    private bool Contains(FileSystemImage image)
+    {
+        if (image == currentTuple.image) return true;
+
+        return queue.Any(t => t.image == image);
     }
 }
