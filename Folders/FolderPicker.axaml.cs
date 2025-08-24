@@ -76,7 +76,7 @@ public partial class FolderPicker : UserControl
         TopLevel topLevel = TopLevel.GetTopLevel(this)!;
         IReadOnlyList<IStorageFolder> folder = await topLevel
             .StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions());
-        if (folder.Count > 0) Folder = Folder with { Path = folder[0].Path.AbsolutePath };
+        if (folder.Count > 0) Folder = Folder with { Path = folder[0].Path.LocalPath };
     }
 
     private void BtnOpen_Click(object? sender, RoutedEventArgs e)
