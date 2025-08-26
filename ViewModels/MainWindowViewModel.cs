@@ -37,7 +37,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private double controlsOpacity;
     private string extensions;
-    private string[]? sources;
+    private string[] sources;
     private WindowState windowState;
     private readonly FiFoImagesBuffer buffer;
     private Rect? cropRect;
@@ -133,7 +133,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public string[]? Sources
+    public string[] Sources
     {
         get => sources;
         set
@@ -143,10 +143,8 @@ public class MainWindowViewModel : ViewModelBase
             sources = value;
             OnPropertyChanged(nameof(Sources));
 
-            if (sources?.Length == 0) ViewControls = true;
-
-            UseSource = sources is not { Length: > 1 };
-            if (sources is not { Length: 1 }) UpdateImages();
+            UseSource = sources.Length <= 1;
+            if (sources.Length != 1) UpdateImages();
             else UpdateImages(0, sources[0]);
         }
     }
@@ -295,6 +293,7 @@ public class MainWindowViewModel : ViewModelBase
         ];
         CopyCollision = FileSystemCollision.Ask;
         Extensions = ".jpg|.jpeg|.jpe|.gif|.tiff|.ico|.png|.bmp";
+        Sources = Array.Empty<string>();
         Source = new Folder(string.Empty, SubfolderType.This);
         Destination = new Folder(string.Empty, SubfolderType.This);
         CroppedImage = new CroppedBitmap();
@@ -438,8 +437,8 @@ public class MainWindowViewModel : ViewModelBase
                 : FolderOnly.GetForward(Source.Path, beginFile, startWithBeginFile, GetExtensions());
         }
 
-        string[]? sources = Sources;
-        if (sources == null || sources.Length == 0) return Array.Empty<string>();
+        string[] sources = Sources;
+        if (sources.Length == 0) return Array.Empty<string>();
         if (sources.Length > 1)
         {
             int index = sources.IndexOf(beginFile);
@@ -470,8 +469,8 @@ public class MainWindowViewModel : ViewModelBase
                 : FolderOnly.GetBackwards(Source.Path, beginFile, GetExtensions());
         }
 
-        string[]? sources = Sources;
-        if (sources == null || sources.Length == 0) return Array.Empty<string>();
+        string[] sources = Sources;
+        if (sources.Length == 0) return Array.Empty<string>();
         if (sources.Length > 1)
         {
             int index = sources.IndexOf(beginFile);

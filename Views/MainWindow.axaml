@@ -42,15 +42,10 @@
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Destination: " Margin="5"
                        VerticalAlignment="Center" HorizontalAlignment="Right" />
 
-            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
-                        IsVisible="{Binding !UseSource}">
-                <TextBlock Text="{Binding Sources.Length,FallbackValue='0'}" />
-                <TextBlock Text=" File(s)" />
-            </StackPanel>
-
             <f:FolderPicker Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="3"
+                            WithSubFolderSelection="True" WithSelectFilesButton="True"
                             Folder="{Binding Source,Mode=TwoWay}"
-                            IsVisible="{Binding UseSource}" />
+                            Files="{Binding Sources,Mode=TwoWay}" />
 
             <f:FolderPicker Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="3"
                             WithSubFolderSelection="False"
