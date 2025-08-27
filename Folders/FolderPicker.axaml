@@ -10,16 +10,20 @@
              x:DataType="local:Folder"
              mc:Ignorable="d"
              Loaded="OnLoaded">
-    <Grid ColumnDefinitions="*,5,Auto,Auto,Auto">
+    <Grid ColumnDefinitions="*,5,Auto,Auto,Auto,Auto">
         <TextBox Name="tbxPath" VerticalAlignment="Center" TextChanged="TbxPath_TextChanged" />
+        <TextBlock Name="tblFiles" VerticalAlignment="Center" IsVisible="False" />
 
         <CheckBox Grid.Column="2" Name="cbxSubFolder" Content="Sub folder" VerticalAlignment="Center"
                   HorizontalAlignment="Center" Margin="0,0,6,0"
                   IsCheckedChanged="CbxSubfolder_IsCheckedChanged" />
 
-        <Button Grid.Column="3" x:Name="btnChange" Content="Change" Margin="0,0,3,0"
-                Padding="10,3,10,3" Click="BtnChange_Click" VerticalAlignment="Center" />
-        <Button Grid.Column="4" x:Name="btnOpen" Content="Open" Margin="3,0,0,0"
-                Padding="10,3,10,3" Click="BtnOpen_Click" VerticalAlignment="Center" />
+        <Button Grid.Column="3" x:Name="btnSelectFolder" Content="Select folder" Margin="0,0,3,0"
+                Padding="10,3,10,3" VerticalAlignment="Center" Click="BtnSelectFolder_Click" />
+        <Button Grid.Column="4" x:Name="btnSelectFiles" Content="Select file(s)" Margin="0,0,3,0"
+                Padding="10,3,10,3" VerticalAlignment="Center" IsVisible="false"
+                Click="BtnSelectFiles_Click" />
+        <Button Grid.Column="5" x:Name="btnOpen" Content="Open" Margin="3,0,0,0"
+                Padding="10,3,10,3" VerticalAlignment="Center" Click="BtnOpen_Click" />
     </Grid>
 </UserControl>
